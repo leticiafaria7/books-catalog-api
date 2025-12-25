@@ -25,3 +25,7 @@ class Book(db.Model):
     availability = db.Column(db.String(20), nullable = False)
     category = db.Column(db.String(20), nullable = False)
     image = db.Column(db.Text, nullable = False)
+
+    __table_args__ = (
+        db.UniqueConstraint('title', 'category', name = 'uq_book_title_category'),
+    )

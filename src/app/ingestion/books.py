@@ -6,26 +6,20 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from urllib.parse import urljoin
-# from IPython.display import Image, display
 from tqdm import tqdm
 from word2number import w2n
 
 from src.app.extensions import db
 from src.app.models import Book
-
-# ----------------------------------------------------------------------------------------------- #
-# Instanciar url
-# ----------------------------------------------------------------------------------------------- #
-
-url = "https://books.toscrape.com/"
+from config import url_books
 
 # ----------------------------------------------------------------------------------------------- #
 # Obter nomes e links das categorias de livros
 # ----------------------------------------------------------------------------------------------- #
 
-def get_dict_categories(url):
+def get_dict_categories(url_books):
 
-    response = requests.get(url)
+    response = requests.get(url_books)
     soup = BeautifulSoup(response.text, 'html.parser')
 
     categories_links = {}
@@ -42,8 +36,6 @@ def get_dict_categories(url):
     # print(f"Quantidade de categorias = {len(categories_links)}")
     return categories_links
 
-categories_links = get_dict_categories(url)
-
 # ----------------------------------------------------------------------------------------------- #
 # Obter informações dos livros
 # ----------------------------------------------------------------------------------------------- #
@@ -53,49 +45,60 @@ def get_books_attrs(url_cat, cat):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     livros_soup = soup.find_all('article')
-    # dados = []
+    dados = []
 
     for livro in livros_soup:
         title = livro.find('h3').find('a')['title']
         price = float(livro.find_all('p')[1].get_text().replace('Â£', ''))
         rating = int(w2n.word_to_num(livro.find('p')['class'][1].lower()))
         availability = livro.find_all('p')[2].get_text(strip=True)
-        image = urljoin(url, livro.find('img')['src'])
+        image = urljoin(url_books, livro.find('img')['src'])
 
-        tmp_dict = {
+        dados.append({
             'title': title,
             'price': price,
             'rating': rating,
             'availability': availability,
             'category': cat,
             'image': image
-        }
+        })
 
-    return tmp_dict, soup
+    return dados, soup
 
-for cat, link in tqdm(categories_links.items()):
+# ----------------------------------------------------------------------------------------------- #
+# Adicionar cada livro na tabela do banco de dados
+# ----------------------------------------------------------------------------------------------- #
 
-    url_cat = url + link
+def populate_books(url_books):
 
-    while True:
-        tmp_dict, soup_cat = get_books_attrs(url_cat, cat)
+    if Book.query.first():
+        print("Tabela de livros já populada. Ignorando...")
 
-        new_book = Book(
-            title = tmp_dict['title'],
-            price = tmp_dict['price'],
-            rating = tmp_dict['rating'],
-            availability = tmp_dict['availability'],
-            category = tmp_dict['category'],
-            image = tmp_dict['image']
-        )
+    else:
+        categories_links = get_dict_categories(url_books)
 
-        db.session.add(new_book)
-        db.session.commit()
+        for cat, link in tqdm(categories_links.items()):
 
-        next_button = soup_cat.find('li', class_ = 'next')
+            url_cat = url_books + link
 
-        if next_button:
-            next_page = next_button.find('a')['href']
-            url_cat = urljoin(url_cat, next_page)
-        else:
-            break
+            while True:
+                dados, soup_cat = get_books_attrs(url_cat, cat)
+
+                for book in dados:
+                    exists = Book.query.filter_by(title = book['title'], category = book['category']).first()
+                    if exists:
+                        continue
+
+                    new_book = Book(**book)
+
+                    db.session.add(new_book)
+                    db.session.commit()
+
+                next_button = soup_cat.find('li', class_ = 'next')
+
+                if next_button:
+                    next_page = next_button.find('a')['href']
+                    url_cat = urljoin(url_cat, next_page)
+                else:
+                    break
+
