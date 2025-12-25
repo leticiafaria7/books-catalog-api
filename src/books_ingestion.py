@@ -9,8 +9,8 @@ from urllib.parse import urljoin
 from tqdm import tqdm
 from word2number import w2n
 
-from src.app.extensions import db
-from src.app.models import Book
+from src.extensions import db
+from src.models import Book
 from config import url_books
 
 # ----------------------------------------------------------------------------------------------- #
