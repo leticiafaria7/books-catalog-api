@@ -73,7 +73,26 @@ def protected():
 @bp.route('/api/v1/books', methods = ['GET'])
 
 def get_books():
-    pass
+    """
+    Lista de livros disponíveis na base
+    ---
+    tags:
+      - Informações dos livros
+    responses:
+      200:
+        description: Dicionário id-título
+        schema:
+          type: object
+          additionalProperties:
+            type: string
+    """
+    books = (
+        db.session.query(Book.id, Book.title)
+        .order_by(Book.id)
+        .all()
+    )
+    
+    return {book_id: title for book_id, title in books}
 
 # ----------------------------------------------------------------------------------------------- #
 # Retornar detalhes completos de um livro específico pelo ID
@@ -104,7 +123,7 @@ def get_categories():
     Lista categorias únicas de livros
     ---
     tags:
-      - Books
+      - Informações dos livros
     responses:
       200:
         description: Lista de categorias
