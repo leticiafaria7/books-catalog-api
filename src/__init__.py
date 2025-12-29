@@ -2,9 +2,9 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
-from flask import Flask
+from flask import Flask, current_app, request
 from .extensions import db, jwt, swagger
-
+from .logging_config import setup_logging
 
 # ----------------------------------------------------------------------------------------------- #
 # Create app
@@ -17,6 +17,11 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     swagger.init_app(app)
+    setup_logging(app)
+
+    @app.before_request
+    def log_request():
+        current_app.logger.info(f"{request.method} {request.path}")
     
     from .models import User, Book
     from .api import api_endpoints, login_routes, pages_layout
