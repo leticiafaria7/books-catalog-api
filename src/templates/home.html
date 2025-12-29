@@ -1,29 +1,51 @@
 <!DOCTYPE html>
-
 <html lang="pt">
-
 <head>
   <title>API | Catálogo de Livros</title>
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
 
-  <!-- Fonte Roboto -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-
 </head>
 
 <body>
-<h1>📚 API | Catálogo de Livros</h1>
 
+<header>
+  <h1><strong>📚 API | Catálogo de livros</strong></h1>
+  <hr>
+</header>
 
-<nav>
-  <a href="/apidocs">Documentação dos Endpoints</a>
-</nav>
+<section class="top">
+  <a class="btn" href="/apidocs">📄 Documentação dos Endpoints</a>
+
+  <div class="metrics">
+    <div class="metric">
+      <strong>{{ total_books }}</strong>
+      <span>Livros no catálogo</span>
+    </div>
+    <div class="metric">
+      <strong>{{ total_categories }}</strong>
+      <span>Categorias</span>
+    </div>
+    <div class="metric">
+      <strong>£ {{ mean_price }}</strong>
+      <span>Preço médio (Min: £ {{ min_price }} | Máx: £ {{ max_price }})</span>
+    </div>
+  </div>
+</section>
+
+<section class="charts-row">
+  <div class="card">
+    {{ rating_chart | safe }}
+  </div>
+  <div class="card">
+    {{ price_chart | safe }}
+  </div>
+</section>
+
+<section class="card full">
+  {{ top_categories_chart | safe }}
+</section>
+
 </body>
-
-
 </html>
