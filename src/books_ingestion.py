@@ -4,10 +4,10 @@
 
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 from urllib.parse import urljoin
 from tqdm import tqdm
 from word2number import w2n
+from sqlalchemy.exc import IntegrityError
 
 from src.extensions import db
 from src.models import Book
@@ -69,36 +69,40 @@ def get_books_attrs(url_cat, cat):
 # Adicionar cada livro na tabela do banco de dados
 # ----------------------------------------------------------------------------------------------- #
 
-def populate_books(url_books):
+def books_count():
+    return db.session.query(Book.id).count()
 
-    if Book.query.first():
-        print("Tabela de livros já populada. Ignorando...")
+def populate_books(url_books, target = 999):
 
-    else:
-        categories_links = get_dict_categories(url_books)
+    categories_links = get_dict_categories(url_books)
 
-        for cat, link in tqdm(categories_links.items()):
+    for cat, link in tqdm(categories_links.items()):
 
-            url_cat = url_books + link
+        if books_count() >= target:
+            break
 
-            while True:
-                dados, soup_cat = get_books_attrs(url_cat, cat)
+        url_cat = url_books + link
 
-                for book in dados:
-                    exists = Book.query.filter_by(title = book['title'], category = book['category']).first()
-                    if exists:
-                        continue
+        while True:
 
-                    new_book = Book(**book)
+            dados, soup_cat = get_books_attrs(url_cat, cat)
 
-                    db.session.add(new_book)
-                    db.session.commit()
+            for book in dados:
 
-                next_button = soup_cat.find('li', class_ = 'next')
-
-                if next_button:
-                    next_page = next_button.find('a')['href']
-                    url_cat = urljoin(url_cat, next_page)
-                else:
+                if books_count() >= target:
                     break
 
+                try:
+                    db.session.add(Book(**book))
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
+                    continue
+
+            next_button = soup_cat.find('li', class_='next')
+
+            if next_button and books_count() < target:
+                next_page = next_button.find('a')['href']
+                url_cat = urljoin(url_cat, next_page)
+            else:
+                break

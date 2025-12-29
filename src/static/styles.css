@@ -1,0 +1,53 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Corpo da página */
+body {
+  background-color: #262626;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 24px;
+}
+
+/* Título */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #fff;
+}
+
+/* Navegação */
+nav {
+  margin-top: 16px;
+}
+
+/* Link como botão */
+nav a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 400;
+
+  padding: 12px 24px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+
+  transition: all 0.3s ease;
+}
+
+/* Hover do botão */
+nav a:hover {
+  background-color: #fff;
+  color: #000;
+}

@@ -5,6 +5,7 @@
 from flask import Flask
 from .extensions import db, jwt, swagger
 
+
 # ----------------------------------------------------------------------------------------------- #
 # Create app
 # ----------------------------------------------------------------------------------------------- #
@@ -18,7 +19,8 @@ def create_app():
     swagger.init_app(app)
     
     from .models import User, Book
-    from .routes import bp
+    from .api import api_endpoints, login_routes, pages_layout
+    from .extensions import bp
 
     app.register_blueprint(bp)
     return app

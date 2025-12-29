@@ -2,16 +2,14 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
-from flasgger import Swagger
-from flask import Blueprint
+from ..extensions import bp
+from flask import render_template
 
 # ----------------------------------------------------------------------------------------------- #
-# Inicializar instâncias
+# Página inicial
 # ----------------------------------------------------------------------------------------------- #
 
-db = SQLAlchemy()
-jwt = JWTManager()
-swagger = Swagger()
-bp = Blueprint('main', __name__)
+@bp.route('/')
+
+def home():
+    return render_template('home.html')
