@@ -117,7 +117,7 @@ def home():
     # ---------- PLOTLY ----------
     title = dict(
         text="📊 Top categorias",
-        subtitle=dict(text="Apenas categorias com mais de 1 livro", 
+        subtitle=dict(text="(Apenas categorias com mais de 1 livro)", 
                       font = dict(color = 'white')),
         x=0.05,
         xanchor="left",
@@ -128,9 +128,9 @@ def home():
         rows=1,
         cols=4,
         subplot_titles=[
-            "Maior quantidade de livros",
+            "Categorias com mais livros",
             "Menores médias de preço",
-            "Maiores médias de ratings",
+            "Mais bem avaliadas (avaliação média)",
             "Melhores scores"
         ]
     )
@@ -156,9 +156,9 @@ def home():
                 x=[d[feature] for d in tmp],
                 y=[d["category"] for d in tmp],
                 text=[
-                    f"{round(d[feature],3)} ({d['qtd_livros']})"
+                    f"{round(d[feature], 2)} ({d['qtd_livros']})"
                     if feature in ["mean_price", "mean_rating"]
-                    else round(d[feature], 3)
+                    else round(d[feature], 2)
                     for d in tmp
                 ],
                 orientation="h",
@@ -195,14 +195,14 @@ def home():
         xref="x4 domain",
         yref="y4 domain",
         x=1.02,
-        y=1.12,
+        y=1.13,
         showarrow=False,
         font=dict(
             size=14,
             color="white"
         ),
         hovertext=(
-            "O score da categoria foi é um valor entre 0 e 1; ele é maior quanto:<br>"
+            "O score da categoria é um valor entre 0 e 1; ele é maior quanto:<br>"
             "• Maior a quantidade de livros<br>"
             "• Menor o preço médio<br>"
             "• Maior o rating médio"
@@ -224,9 +224,9 @@ def home():
         "home.html",
         total_books=total_books,
         total_categories=total_categories,
-        mean_price=mean_price,
-        min_price=round(min_price, 2),
-        max_price=round(max_price, 2),
+        mean_price=str(f"{round(mean_price, 2):.2f}"),
+        min_price=str(f"{round(min_price, 2):.2f}"),
+        max_price=str(f"{round(max_price, 2):.2f}"),
         rating_chart=rating_chart,
         price_chart=price_chart,
         top_categories_chart=top_categories_chart
