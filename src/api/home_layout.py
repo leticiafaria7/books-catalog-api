@@ -8,6 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
 from plotly.subplots import make_subplots
+from PIL import Image
 from ..extensions import db, bp
 from ..models import Book
 
@@ -48,11 +49,11 @@ def home():
         orientation="h"
     )
 
-    fig_rating.update_layout(plot_bgcolor = "rgba(0, 0, 0, 0)", paper_bgcolor = "rgba(0, 0, 0, 0)", height = 300, width = 800, barcornerradius = 4, margin = dict(t = 100),
-                             title = dict(text = '✨ Quantidade de livros por nota', font = dict(color = 'white')))
-    fig_rating.update_traces(width = 0.5, textposition = 'outside', textfont = dict(size = 10, color = 'white'), marker_color = 'steelblue',
+    fig_rating.update_layout(plot_bgcolor = "rgba(0, 0, 0, 0)", paper_bgcolor = "rgba(0, 0, 0, 0)", height = 300, barcornerradius = 4, margin = dict(t = 100),
+                             title = dict(text = '✨ Quantidade de livros por nota', font = dict(color = 'white', size = 15, family = 'Roboto')))
+    fig_rating.update_traces(width = 0.5, textposition = 'outside', textfont = dict(size = 10, color = 'white'), marker_color = 'white',
                              hovertemplate = '%{x} livros avaliados com %{y}<extra></extra>')
-    fig_rating.update_xaxes(title = '', tickfont = dict(size = 10, color = '#4d4d4d'), range = (0, 300), showgrid = False)
+    fig_rating.update_xaxes(title = '', tickfont = dict(size = 10, color = '#4d4d4d'), range = (0, 250), showgrid = False)
     fig_rating.update_yaxes(title = '', tickfont = dict(size = 10, color = '#d4d4d4'), showgrid = False)
     rating_chart = pio.to_html(fig_rating, full_html=False)
 
@@ -63,12 +64,13 @@ def home():
     prices = [p[0] for p in db.session.query(Book.price).all()]
     fig_price = px.histogram(prices, nbins = 50)
 
-    fig_price.update_layout(plot_bgcolor = "rgba(0, 0, 0, 0)", paper_bgcolor = "rgba(0, 0, 0, 0)", height = 300, width = 800, showlegend = False, margin = dict(t = 100),
-                            title = dict(text = '💰 Distribuição de preços', font = dict(color = 'white')))
-    fig_price.update_xaxes(range = (0, 70), tickfont = dict(size = 10, color = '#d4d4d4'), showgrid = False,
-                           title = dict(text = 'Preço (£)', font = dict(color = 'white')))
+    fig_price.update_layout(plot_bgcolor = "rgba(0, 0, 0, 0)", paper_bgcolor = "rgba(0, 0, 0, 0)", height = 300, showlegend = False, margin = dict(t = 100),
+                            title = dict(text = '💰 Distribuição de preços', font = dict(color = 'white', size = 15, family = 'Roboto')),
+                            xaxis = dict(tickformat = ".0f", tickprefix = "£"))
+    fig_price.update_xaxes(range = (5, 65), tickfont = dict(size = 10, color = '#d4d4d4'), showgrid = False,
+                           title = dict(text = 'Preço (£)', font = dict(color = 'white', size = 12)))
     fig_price.update_yaxes(title = '', tickfont = dict(size = 10, color = '#4d4d4d'), showgrid = False)
-    fig_price.update_traces(marker_color = 'steelblue', hovertemplate = '<extra></extra>')
+    fig_price.update_traces(marker_color = 'white', hovertemplate = '<extra></extra>')
     fig_price.add_hline(y = 0, line_width = 1)
     price_chart = pio.to_html(fig_price, full_html=False)
 
@@ -121,7 +123,7 @@ def home():
                       font = dict(color = 'white')),
         x=0.05,
         xanchor="left",
-        font = dict(color = 'white')
+        font = dict(color = 'white', size = 16, family = 'Roboto')
     )
 
     fig = make_subplots(
@@ -132,13 +134,14 @@ def home():
             "Menores médias de preço",
             "Mais bem avaliadas (avaliação média)",
             "Melhores scores"
-        ]
+        ],
+        horizontal_spacing=0.1
     )
 
     features = {
         "n_books": (1, True, 200),
-        "mean_price": (2, False, 60),
-        "mean_rating": (3, True, 10),
+        "mean_price": (2, False, 80),
+        "mean_rating": (3, True, 15),
         "category_score": (4, True, 0.5)
     }
 
@@ -169,7 +172,7 @@ def home():
         )
 
         fig.update_xaxes(range=(0, x_max), tickfont = dict(size = 10, color = '#4d4d4d'), showgrid = False, row=1, col=col)
-        fig.update_yaxes(title = '', tickfont = dict(size = 10, color = '#d4d4d4'), showgrid = False, row=1, col=col)
+        fig.update_yaxes(title = '', tickfont = dict(size = 10, color = '#d4d4d4'), showgrid = False, domain=[0, 0.95], row=1, col=col)
 
     fig.update_layout(
         plot_bgcolor = "rgba(0, 0, 0, 0)", 
@@ -177,32 +180,47 @@ def home():
         showlegend=False,
         title = title,
         barcornerradius=4,
-        height=400,
-        margin = dict(t = 150)
+        height=320,
+        # margin = dict(t = 150)
     )
 
     fig.update_traces(
         width=0.5,
         textposition="outside",
-        marker_color="steelblue",
+        marker_color="white",
         textfont = dict(color = 'white', size = 10)
     )
 
-    fig.update_annotations(font = dict(color = "white", size = 12))
+    fig.update_annotations(font = dict(color = "white", size = 11, family = 'Roboto'))
 
+    # Ícone (imagem)
+    fig.add_layout_image(
+        dict(
+            source="/static/question_mark.png",
+            xref="x4 domain",
+            yref="y4 domain",
+            x=1.02,
+            y=1.18,
+            sizex=0.1,
+            sizey=0.1,
+            xanchor="left",
+            yanchor="top",
+            layer="above"
+        )
+    )
+
+    # Ponto invisível para hover
     fig.add_annotation(
-        text="<b>(?)</b>",
+        x=1.03,
+        y=1.18,
         xref="x4 domain",
         yref="y4 domain",
-        x=1.02,
-        y=1.13,
+        xanchor='left',
+        text="   ",  # texto vazio
         showarrow=False,
-        font=dict(
-            size=14,
-            color="white"
-        ),
         hovertext=(
-            "O score da categoria é um valor entre 0 e 1; ele é maior quanto:<br>"
+            "O score da categoria é um valor entre 0 e 1;<br>"
+            "ele é maior quanto:<br>"
             "• Maior a quantidade de livros<br>"
             "• Menor o preço médio<br>"
             "• Maior o rating médio"
@@ -210,8 +228,8 @@ def home():
         hoverlabel=dict(
             bgcolor="#4d4d4d",
             font_size=12,
-            font_family="Roboto",
-        ), align = 'left'
+            font_family="Roboto"
+        ),
     )
 
     top_categories_chart = pio.to_html(fig, full_html=False)

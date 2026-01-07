@@ -9,43 +9,44 @@
 </head>
 
 <body>
+  <div class="page-container">
 
-<header>
-  <h1><strong>📚 API | Catálogo de livros</strong></h1>
-  <hr>
-</header>
+    <header>
+      <h2><strong>📚 API | Catálogo de livros</strong></h2>
+      <hr>
+    </header>
 
-<section class="top">
-  <a class="btn" href="/apidocs">📄 Documentação dos Endpoints</a>
+    <section class="top">
+      <a class="btn" href="/apidocs">📄 Documentação dos Endpoints</a>
 
-  <div class="metrics">
-    <div class="metric">
-      <strong>{{ total_books }}</strong>
-      <span>Livros no catálogo</span>
-    </div>
-    <div class="metric">
-      <strong>{{ total_categories }}</strong>
-      <span>Categorias</span>
-    </div>
-    <div class="metric">
-      <strong>£ {{ mean_price }}</strong>
-      <span>Preço médio (Min: £ {{ min_price }} | Máx: £ {{ max_price }})</span>
-    </div>
+      <div class="metrics">
+        <div class="metric">
+          <strong>{{ total_books }}</strong>
+          <span>Livros no catálogo</span>
+        </div>
+        <div class="metric">
+          <strong>{{ total_categories }}</strong>
+          <span>Categorias</span>
+        </div>
+        <div class="metric">
+          <strong>£ {{ mean_price }}</strong>
+          <span>Preço médio (Min: £ {{ min_price }} | Máx: £ {{ max_price }})</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="charts-row">
+      <div class="card">
+        {{ rating_chart | safe }}
+      </div>
+      <div class="card">
+        {{ price_chart | safe }}
+      </div>
+    </section>
+
+    <section class="card full">
+      {{ top_categories_chart | safe }}
+    </section>
   </div>
-</section>
-
-<section class="charts-row">
-  <div class="card">
-    {{ rating_chart | safe }}
-  </div>
-  <div class="card">
-    {{ price_chart | safe }}
-  </div>
-</section>
-
-<section class="card full">
-  {{ top_categories_chart | safe }}
-</section>
-
 </body>
 </html>

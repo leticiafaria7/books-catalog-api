@@ -3,6 +3,8 @@
 # ----------------------------------------------------------------------------------------------- #
 
 from flask import Flask, current_app, request
+
+from .api import home_layout
 from .extensions import db, jwt, swagger
 from .logging_config import setup_logging
 
@@ -24,7 +26,7 @@ def create_app():
         current_app.logger.info(f"{request.method} {request.path}")
     
     from .models import User, Book
-    from .api import api_endpoints, login_routes, pages_layout
+    from .api import api_endpoints, login_routes
     from .extensions import bp
 
     app.register_blueprint(bp)

@@ -37,7 +37,7 @@ books-api/
 │   └── api/
 │       ├── api_endpoints.py
 │       ├── login_routes.py
-│       └── pages_layout.py
+│       └── home_layout.py
 ├── data/
 │   └── base_livros.csv
 ├── instance/
