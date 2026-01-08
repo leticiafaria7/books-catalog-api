@@ -8,8 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
 from plotly.subplots import make_subplots
-from ..extensions import db, bp
-from ..models import Book
+from ..instances import db, bp, Book
 
 # ----------------------------------------------------------------------------------------------- #
 # Página inicial

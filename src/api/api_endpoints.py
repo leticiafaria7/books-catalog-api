@@ -4,8 +4,7 @@
 
 from flask import request, jsonify, current_app
 from sqlalchemy import text, func
-from ..models import Book
-from ..extensions import db, bp
+from ..instances import db, bp, Book
 
 # ----------------------------------------------------------------------------------------------- #
 # Listar os livros disponíveis na base de dados

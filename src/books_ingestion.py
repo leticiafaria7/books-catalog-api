@@ -9,8 +9,8 @@ from tqdm import tqdm
 from word2number import w2n
 from sqlalchemy.exc import IntegrityError
 
-from src.extensions import db
-from src.models import Book
+from src.instances import db, Book
+
 from config import url_books
 
 # ----------------------------------------------------------------------------------------------- #

@@ -23,10 +23,8 @@ books-api/
 ├── src/
 │   ├── __init__.py
 │   ├── books_ingestion.py
-│   ├── extensions.py
-│   ├── models.py
+│   ├── instances.py
 │   ├── logging_config.py
-│   ├── utils.py
 │   ├── scraping/
 │   │   └── scraping_to_csv.ipynb
 │   ├── templates/
