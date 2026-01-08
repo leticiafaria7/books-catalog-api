@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------------------------------- #
 
 from flask import request, jsonify, current_app
+from flask_jwt_extended import jwt_required
 from sqlalchemy import text, func
 from ..instances import db, bp, Book
 
@@ -11,13 +12,15 @@ from ..instances import db, bp, Book
 # ----------------------------------------------------------------------------------------------- #
 
 @bp.route('/api/v1/books', methods = ['GET'])
-
+@jwt_required()
 def get_books():
     """
     Lista de livros disponíveis na base
     ---
     tags:
       - Informações dos livros
+    security:
+      - BearerAuth: []
     responses:
       200:
         description: Dicionário id-título
@@ -25,6 +28,8 @@ def get_books():
           type: object
           additionalProperties:
             type: string
+      401:
+        description: Token não fornecido ou inválido
     """
     books = (
         db.session.query(Book.id, Book.title)

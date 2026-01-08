@@ -13,6 +13,30 @@ from ..instances import db, bp, User
 @bp.route('/api/v1/auth/register', methods = ['POST'])
 
 def register_user():
+    """
+    Registra um novo usuário.
+    ---
+    tags:
+        - Sistema de autenticação
+    parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+    responses:
+        201:
+            description: Usuário criado com sucesso
+        400:
+            description: Usuário já existe
+        415:
+            description: Tipo de entrada não suportado
+    """
     data = request.get_json()
     if User.query.filter_by(username = data['username']).first():
         return jsonify({'error': 'User already exists'}), 400
@@ -32,6 +56,28 @@ def register_user():
 @bp.route('/api/v1/auth/login', methods = ['POST'])
 
 def login():
+    """
+    Faz login do usuário e retorna um JWT
+    ---
+    tags:
+        - Sistema de autenticação
+    parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+                username:
+                    type: string
+                password:
+                    type: string
+    responses:
+        201:
+            description: Login bem sucedido, retorna JWT
+        400:
+            description: Credenciais inválidas
+    """
     data = request.get_json()
     user = User.query.filter_by(username = data['username']).first()
 
