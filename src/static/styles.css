@@ -12,7 +12,7 @@ body {
 
 .page-container {
   max-width: 1200px;     /* largura máxima do conteúdo */
-  margin: 10px auto;    /* centraliza e reduz margens automaticamente */
+  margin: 20px auto;    /* centraliza e reduz margens automaticamente */
   padding: 20px 40px;
 }
 
@@ -31,7 +31,7 @@ hr {
   display: flex;
   /* justify-content: space-between; */
   align-items: center;
-  margin-top: 50px;
+  margin-top: 30px;
 }
 
 .btn {
@@ -42,7 +42,7 @@ hr {
   font-weight: 1000;
   text-align: left;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   text-decoration: none;
   border: 1px solid #2f2f2f;
   transition: all 0.25s ease;

@@ -2,13 +2,12 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
-from flask import Blueprint, render_template
+from flask import render_template
 from sqlalchemy import func
 import plotly.express as px
 import plotly.graph_objects as go
 import plotly.io as pio
 from plotly.subplots import make_subplots
-from PIL import Image
 from ..extensions import db, bp
 from ..models import Book
 
@@ -123,7 +122,7 @@ def home():
                       font = dict(color = 'white')),
         x=0.05,
         xanchor="left",
-        font = dict(color = 'white', size = 16, family = 'Roboto')
+        font = dict(color = 'white', size = 15, family = 'Roboto')
     )
 
     fig = make_subplots(
