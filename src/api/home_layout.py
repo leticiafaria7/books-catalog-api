@@ -233,17 +233,17 @@ def home():
     top_categories_chart = pio.to_html(fig, full_html=False)
 
     # ----------------------------------------------------------------------------------------------- #
-    # Renderizar
+    # Renderizar os gráficos na página inicial
     # ----------------------------------------------------------------------------------------------- #
 
     return render_template(
         "home.html",
-        total_books=total_books,
-        total_categories=total_categories,
-        mean_price=str(f"{round(mean_price, 2):.2f}"),
-        min_price=str(f"{round(min_price, 2):.2f}"),
-        max_price=str(f"{round(max_price, 2):.2f}"),
-        rating_chart=rating_chart,
-        price_chart=price_chart,
-        top_categories_chart=top_categories_chart
+        total_books = total_books,
+        total_categories = total_categories,
+        mean_price = str(f"{round(mean_price, 2):.2f}"),
+        min_price = str(f"{round(min_price, 2):.2f}"),
+        max_price = str(f"{round(max_price, 2):.2f}"),
+        rating_chart = rating_chart,
+        price_chart = price_chart,
+        top_categories_chart = top_categories_chart
     )

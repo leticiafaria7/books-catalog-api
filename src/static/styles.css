@@ -1,18 +1,14 @@
 body {
   margin: 0;
   padding: 0;
-  /* padding: 20px 40px; */
   font-family: 'Roboto', sans-serif;
   background-color: #2f2f2f;
   color: white;
-  /* margin-left: 320px;
-  margin-right: 320px;
-  margin-top: 10px; */
 }
 
 .page-container {
-  max-width: 1200px;     /* largura máxima do conteúdo */
-  margin: 20px auto;    /* centraliza e reduz margens automaticamente */
+  max-width: 1200px;
+  margin: 20px auto;
   padding: 20px 40px;
 }
 
@@ -29,14 +25,13 @@ hr {
 
 .top {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   margin-top: 30px;
 }
 
 .btn {
   background: #2f2f2f;
-  padding: 18px 80px;          /* ↑ botão maior */
+  padding: 18px 80px;
   border-radius: 8px;
   font-family: 'Roboto', bold;
   font-weight: 1000;
@@ -51,7 +46,6 @@ hr {
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-/* Hover */
 .btn:hover {
   background: #2f2f2f;
   border-color: #2f2f2f;
@@ -64,7 +58,6 @@ hr {
 .metrics {
   display: flex;
   gap: 40px;
-  /* margin-left: 10px; */
 }
 
 .metric {
@@ -80,7 +73,6 @@ hr {
 .metric span {
   font-size: 11px;
   font-family: 'Roboto', sans-serif;
-  /* opacity: 0.9; */
 }
 
 .charts-row {
