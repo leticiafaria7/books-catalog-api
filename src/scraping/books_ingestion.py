@@ -1,19 +1,36 @@
+# -*- coding: utf-8 -*-
+
 # ----------------------------------------------------------------------------------------------- #
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
 import requests
+import pandas as pd
+import pytz
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from tqdm import tqdm
 from word2number import w2n
-from sqlalchemy.exc import IntegrityError
+from datetime import datetime
+from typing import Dict, Tuple
 
-from src.instances import db, Book
+import sys
+from pathlib import Path
+
+# adicionar o caminho da pasta raiz
+PROJECT_ROOT = Path().resolve().parents[1]
+sys.path.append(str(PROJECT_ROOT))
 
 from config import url_books
 
-from typing import List, Dict, Tuple, Any
+# ----------------------------------------------------------------------------------------------- #
+# Função para printar o horário da execução
+# ----------------------------------------------------------------------------------------------- #
+
+def horario_atual(texto = "Término da execução", gap = 0):
+
+    hora_atual = datetime.now(pytz.timezone("America/Sao_Paulo"))
+    print(f"{texto.ljust(gap)}: {hora_atual.strftime('%d/%m/%Y %H:%M:%S')}")
 
 # ----------------------------------------------------------------------------------------------- #
 # Obter nomes e links das categorias de livros
@@ -42,6 +59,7 @@ def get_dict_categories(url_books: str) -> Dict[str, str]:
 
     # fazer a requisição para obter o conteúdo da página e transformar o conteúdo HTML em um objeto BeautifulSoup para navegação
     response = requests.get(url_books)
+    response.encoding = response.apparent_encoding
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # inicializar dicionário {categoria:link}
@@ -66,21 +84,28 @@ def get_dict_categories(url_books: str) -> Dict[str, str]:
 # Obter informações dos livros
 # ----------------------------------------------------------------------------------------------- #
 
-def get_books_attrs(url_cat: str, cat: str) -> Tuple[List[Dict[str, Any]], BeautifulSoup]:
+def get_books_attrs(url_cat: str, cat: str) -> Tuple[pd.DataFrame, BeautifulSoup]:
     """
     Extrai os atributos de todos os livros presentes em uma página de categoria específica.
 
-    Realiza o parsing do HTML para coletar título, preço, avaliação, disponibilidade 
-    e a URL da imagem de cada livro, organizando-os em uma lista de dicionários.
+    A função realiza uma requisição HTTP para a URL da categoria informada,
+    faz o parsing do HTML retornado e coleta informações relevantes de cada livro
+    listado na página. Os dados extraídos incluem título, preço, avaliação,
+    disponibilidade, categoria e URL da imagem. Ao final, os dados são organizados
+    em um DataFrame do pandas para facilitar análises posteriores.
 
     Args:
         url_cat (str): URL completa da página da categoria a ser raspada.
         cat (str): Nome da categoria correspondente à URL (usado para rotular os dados).
 
     Returns:
-        Tuple[List[Dict[str, Any]], BeautifulSoup]: Uma tupla contendo:
-            - Uma lista de dicionários, onde cada dicionário contém os dados de um livro.
-            - O objeto BeautifulSoup da página, permitindo verificações posteriores (ex: paginação).
+        Tuple[pd.DataFrame, BeautifulSoup]:
+            Uma tupla contendo:
+            - pd.DataFrame: DataFrame onde cada linha representa um livro e
+              cada coluna representa um atributo extraído (título, preço,
+              avaliação, disponibilidade, categoria e imagem).
+            - BeautifulSoup: Objeto BeautifulSoup correspondente ao HTML da
+              página, útil para verificações adicionais como paginação.
 
     Raises:
         requests.exceptions.RequestException: Se houver erro na requisição HTTP.
@@ -89,6 +114,7 @@ def get_books_attrs(url_cat: str, cat: str) -> Tuple[List[Dict[str, Any]], Beaut
     
     # fazer a requisição para a página da categoria
     response = requests.get(url_cat)
+    response.encoding = response.apparent_encoding
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # localizar todos os elementos <article> (livros da página)
@@ -100,7 +126,7 @@ def get_books_attrs(url_cat: str, cat: str) -> Tuple[List[Dict[str, Any]], Beaut
     # para cada livro, extrair e transformar os dados solicitados
     for livro in livros_soup:
         title = livro.find('h3').find('a')['title']
-        price = float(livro.find_all('p')[1].get_text().replace('Â£', ''))
+        price = float(livro.find_all('p')[1].get_text().replace('£', ''))
         rating = int(w2n.word_to_num(livro.find('p')['class'][1].lower()))
         availability = livro.find_all('p')[2].get_text(strip=True)
         image = urljoin(url_books, livro.find('img')['src'])
@@ -115,86 +141,89 @@ def get_books_attrs(url_cat: str, cat: str) -> Tuple[List[Dict[str, Any]], Beaut
             'image': image
         })
 
-    return dados, soup
+    return pd.DataFrame(dados), soup
 
 # ----------------------------------------------------------------------------------------------- #
 # Adicionar cada livro na tabela do banco de dados
 # ----------------------------------------------------------------------------------------------- #
 
-def books_count() -> int:
+def populate_books(url_books: str) -> pd.DataFrame:
     """
-    Utiliza a sessão do SQLAlchemy para executar uma consulta,
-    contando apenas os identificadores (IDs) na tabela de livros.
+    Extrai livros de todas as categorias e consolida os dados em uma base única.
 
-    Returns:
-        int: O número total de livros cadastrados na base de dados.
-    """
-
-    # executar uma query na coluna ID para obter o total de registros
-    return db.session.query(Book.id).count()
-
-def populate_books(url_books: str, target: int = 999) -> None:
-    """
-    Extrai livros de todas as categorias e popula o banco de dados.
-
-    A função percorre cada categoria do site, extrai os dados dos livros (incluindo
-    suporte a paginação) e os salva no banco de dados até que o limite definido
-    pelo 'target' seja atingido ou todos os livros sejam processados.
+    A função percorre todas as categorias disponíveis no catálogo de livros,
+    acessando cada página de categoria e tratando a paginação quando existente.
+    Para cada página, os dados dos livros são extraídos e acumulados em um
+    DataFrame único, que ao final contém todos os livros encontrados no site.
 
     Args:
-        url_books (str): A URL base do catálogo de livros.
-        target (int): O número máximo de livros desejados no banco de dados. O padrão é 999.
+        url_books (str):
+            URL base do catálogo de livros, utilizada para montar os links
+            completos das categorias e páginas subsequentes.
 
     Returns:
-        None: A função realiza operações de escrita no banco de dados e não retorna valores.
+        pd.DataFrame:
+            DataFrame contendo todos os livros extraídos de todas as categorias,
+            com seus respectivos atributos (título, preço, avaliação,
+            disponibilidade, categoria e imagem).
 
     Note:
-        Requer as funções auxiliares `get_dict_categories`, `get_books_attrs` 
-        e `books_count`, além do objeto de banco de dados `db` e o modelo `Book`.
+        Esta função depende das seguintes funções e objetos auxiliares:
+        - get_dict_categories: para obter o mapeamento entre categorias e seus links.
+        - get_books_attrs: para extrair os atributos dos livros de cada página.
+        - tqdm: para exibir a barra de progresso durante a iteração.
     """
+    gap = 70
+    horario_atual('Início da execução', gap = gap)
+    base_livros = pd.DataFrame()
 
     # gerar o dicionário mapeando nomes de categorias aos seus links
+    horario_atual("Obtendo o dicionário das categorias e respectivos links", gap = gap)
+    print()
     categories_links = get_dict_categories(url_books)
 
     # iterar por categoria
+    horario_atual("Iterando as categorias para obter os dados dos livros", gap = gap)
     for cat, link in tqdm(categories_links.items()):
-
-        # se já tiver todos os livros, interromper a execução
-        if books_count() >= target:
-            break
 
         # link completo da categoria
         url_cat = url_books + link
 
-        # loop para gerenciar a paginação da categoria
+        # Loop para tratar a paginação dentro de cada categoria
         while True:
+            # Extrai os dados dos livros da página atual e o HTML parseado
+            tmp, soup_cat = get_books_attrs(url_cat, cat)
 
-            # obter os dados dos livros e o objeto soup da página atual
-            dados, soup_cat = get_books_attrs(url_cat, cat)
+            # Concatena os dados extraídos ao DataFrame principal
+            base_livros = pd.concat(
+                [base_livros, tmp],
+                ignore_index=True
+            )
 
-            # iterar em cada livro
-            for book in dados:
-
-                # verificar novamente se o banco já tem todos os livros
-                if books_count() >= target:
-                    break
-
-                try:
-                    # instanciar um novo objeto Book fazendo o unpacking (**) do dicionário e salvar no banco
-                    db.session.add(Book(**book))
-                    db.session.commit()
-                except IntegrityError:
-                    # se o livro já existir, desfazer a transação e ignorar
-                    db.session.rollback()
-                    continue
-
-            # verificar se há um botão "next" na página
+            # Verifica a existência do botão de próxima página
             next_button = soup_cat.find('li', class_='next')
 
-            if next_button and books_count() < target:
-                # se tiver, pegar o link da próxima página
+            if next_button:
+                # Caso exista, extrai o link da próxima página
                 next_page = next_button.find('a')['href']
+
+                # Atualiza a URL da categoria para apontar para a próxima página
                 url_cat = urljoin(url_cat, next_page)
             else:
-                # se não houver mais páginas, sai do loop "while" da categoria
+                # Encerra o loop quando não há mais páginas na categoria
                 break
+
+    horario_atual('Término do loop', gap = gap)
+    print()
+    print(f"Tamanho da base de dados: {base_livros.shape[0]}")
+
+    # remover livros duplicados
+    base_livros = base_livros.drop_duplicates(subset = 'title').reset_index(drop = True)
+
+    # criar coluna de id
+    base_livros = base_livros.reset_index(names = 'id').assign(id = lambda df: df['id'] + 1)
+
+    # salvar base de dados
+    base_livros.to_csv('../../data/base_livros.csv', index = False)
+    horario_atual('Base de dados salva', gap = gap)
+    print()

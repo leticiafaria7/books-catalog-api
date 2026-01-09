@@ -15,7 +15,7 @@ Este aplicativo é uma **API pública** que permite alimentar sistemas de recome
 
 ## 📂 Estrutura do projeto
 ```
-books-api/
+books-catalog-api/
 ├── README.md
 ├── requirements.txt
 ├── main.py

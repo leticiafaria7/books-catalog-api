@@ -3,24 +3,28 @@
 # ----------------------------------------------------------------------------------------------- #
 
 from flask import request, jsonify, current_app
-from flask_jwt_extended import jwt_required
-from sqlalchemy import text, func
-from ..instances import db, bp, Book
+import pandas as pd
+from datetime import datetime
+from ..instances import bp
+
+# ----------------------------------------------------------------------------------------------- #
+# Ler a base de dados
+# ----------------------------------------------------------------------------------------------- #
+
+df = pd.read_csv('data/base_livros.csv')
 
 # ----------------------------------------------------------------------------------------------- #
 # Listar os livros disponíveis na base de dados
 # ----------------------------------------------------------------------------------------------- #
 
 @bp.route('/api/v1/books', methods = ['GET'])
-@jwt_required()
+
 def get_books():
     """
     Lista de livros disponíveis na base
     ---
     tags:
       - Informações dos livros
-    security:
-      - BearerAuth: []
     responses:
       200:
         description: Dicionário id-título
@@ -28,18 +32,10 @@ def get_books():
           type: object
           additionalProperties:
             type: string
-      401:
-        description: Token não fornecido ou inválido
     """
-    books = (
-        db.session.query(Book.id, Book.title)
-        .order_by(Book.id)
-        .all()
-    )
-    
-    response = {book_id: title for book_id, title in books}
+    dict_books = df.set_index('id')['title'].to_dict()
 
-    return jsonify(response), 200
+    return jsonify(dict_books), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Listar todas as categorias de livros disponíveis
@@ -64,14 +60,9 @@ def get_categories():
               items:
                 type: string
     """
-    categories = (
-        db.session.query(Book.category)
-        .distinct()
-        .order_by(Book.category)
-        .all()
-    )
+    categories = {'categories': list(df['category'].unique())}
     
-    return jsonify({'categories': [c[0] for c in categories]}), 200
+    return jsonify(categories), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Retornar detalhes completos de um livro específico pelo ID
@@ -99,22 +90,9 @@ def get_book_info(id):
         description: Livro não encontrado
     """
 
-    livro = Book.query.get(id)
+    livro = df[df['id'] == id].to_dict(orient = 'records')
 
-    if not livro:
-        return jsonify({'error': 'Livro não encontrado'}), 404
-
-    return jsonify(
-        {
-            'id': livro.id,
-            'title': livro.title,
-            'price': livro.price,
-            'rating': livro.rating,
-            'availability': livro.availability,
-            'category': livro.category,
-            'image': livro.image
-        }
-    ), 200
+    return jsonify(livro), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Buscar livro por título e/ou categoria
@@ -150,33 +128,20 @@ def get_books_search():
     title = request.args.get('title')
     category = request.args.get('category')
 
-    query = Book.query
+    df_query = df.copy()
+
     if title:
-        query = query.filter(Book.title.ilike(f'%{title}%'))
+        df_query = df_query[df_query['title'].str.lower().str.contains(title.lower())]
+
     if category:
-        query = query.filter(Book.category.ilike(f'%{category}%'))
+        df_query = df_query[df_query['category'].str.lower().str.contains(category.lower())]
 
-    books_found = query.all()
-
-    if not books_found:
-        return jsonify({'message': 'Nenhum livro encontrado'}), 404
-    
-    return jsonify([
-        {
-            'id': b.id,
-            'title': b.title,
-            'price': b.price,
-            'rating': b.rating,
-            'availability': b.availability,
-            'category': b.category,
-            'image': b.image
-        }
-        for b in books_found
-    ]), 200
+    return jsonify(df_query.to_dict(orient = 'records')), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Estatísticas gerais da coleção
 # ----------------------------------------------------------------------------------------------- #
+
 @bp.route('/api/v1/stats/overview', methods = ['GET'])
 
 def get_overview():
@@ -189,31 +154,18 @@ def get_overview():
       200:
         description: Estatísticas gerais da coleção
     """
-    total_books = int(db.session.query(func.count(Book.id))[0][0])
-    mean_price = round(float(db.session.query(func.avg(Book.price))[0][0]), 2)
-
-    dist_ratings = (
-        db.session.query(
-            Book.rating.label('rating'),
-            func.count(Book.id).label('n_rating')
-        )
-        .group_by(Book.rating)
-        .order_by(Book.rating)
-        .all()
-    )
-
-    dict_results = {
-        'total_books': total_books,
-        'mean_price': mean_price,
-        'ratings_distribution': dict(dist_ratings)
+    dict_overview = {
+        'total_books': df.shape[0],
+        'mean_price': round(df['price'].mean(), 2),
+        'ratings_distribution': df['rating'].value_counts().to_dict()
     }
     
-    return jsonify(dict_results), 200
-
+    return jsonify(dict_overview), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Estatísticas por categoria
 # ----------------------------------------------------------------------------------------------- #
+
 @bp.route('/api/v1/stats/categories', methods = ['GET'])
 
 def get_category_stats():
@@ -225,56 +177,27 @@ def get_category_stats():
     responses:
       200:
         description: Estatísticas por categoria
-        schema:
-          type: object
-          additionalProperties:
-            type: object
-            properties:
-              n_books:
-                type: integer
-              min_price:
-                type: number
-                format: float
-              max_price:
-                type: number
-                format: float
-              mean_price:
-                type: number
-                format: float
-              mean_rating:
-                type: number
-                format: float
+
     """
-    results = (
-        db.session.query(
-            Book.category.label('category'),
-            func.count(Book.id).label('n_books'),
-            func.min(Book.price).label('min_price'),
-            func.max(Book.price).label('max_price'),
-            func.avg(Book.price).label('mean_price'),
-            func.avg(Book.rating).label('mean_rating')
+    lista_stats_cats = (
+        df.groupby('category')
+        .agg(
+            n_books = ('title', 'count'),
+            price_min = ('price', 'min'),
+            price_max = ('price', 'max'),
+            price_mean = ('price', 'mean'),
+            rating_mean = ('rating', 'mean')
         )
-        .group_by(Book.category)
-        .order_by(Book.category)
-        .all()
+        .round(2)
+        .to_dict(orient='index')
     )
 
-    response = {
-        r.category: {
-            'n_books': r.n_books,
-            'min_price': float(r.min_price),
-            'max_price': float(r.max_price),
-            'mean_price': round(float(r.mean_price), 2),
-            'mean_rating': round(float(r.mean_rating), 2)
-        }
-        for r in results
-    }
-
-    return jsonify(response), 200
+    return jsonify(lista_stats_cats), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Livros com maior avaliação
 # ----------------------------------------------------------------------------------------------- #
+
 @bp.route('/api/v1/books/top-rated', methods = ['GET'])
 
 def get_top_rated():
@@ -289,24 +212,14 @@ def get_top_rated():
       404:
         description: Não foram encontrados resultados
     """
-    books_top_rated = Book.query.filter(Book.rating == 5).all()
+    books_top_rated = df[df['rating'] == df['rating'].max()].to_dict(orient = 'records')
 
-    return jsonify([
-        {
-            'id': b.id,
-            'title': b.title,
-            'price': b.price,
-            'rating': b.rating,
-            'availability': b.availability,
-            'category': b.category,
-            'image': b.image
-        }
-        for b in books_top_rated
-    ]), 200
+    return jsonify(books_top_rated), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Filtrar livros dentro de uma faixa de preço específica
 # ----------------------------------------------------------------------------------------------- #
+
 @bp.route('/api/v1/books/price-range', methods = ['GET'])
 
 def get_books_price_range():
@@ -333,33 +246,38 @@ def get_books_price_range():
         description: Lista de livros encontrados
       404:
         description: Não foram encontrados resultados
+      500:
+        description: Formato de valor inválido
+    
     """
     min_price = request.args.get('min')
     max_price = request.args.get('max')
 
-    query = Book.query
-    if min:
-        query = query.filter(Book.price >= min_price)
-    if max:
-        query = query.filter(Book.price <= max_price)
+    def is_float(valor: str) -> bool:
+      try:
+          float(valor.replace(',', '.'))
+          return True
+      except (ValueError, TypeError):
+          return False
 
-    books_found = query.all()
+    df_query = df.copy()
+
+    if min_price:
+        if is_float(min_price):
+          df_query = df_query[df_query['price'] >= float(min_price.replace(',', '.'))]
+        else:
+            return jsonify({'message': 'Formato de valor inválido'}), 500
+
+    if max_price:
+        if is_float(max_price):
+          df_query = df_query[df_query['price'] <= float(max_price.replace(',', '.'))]
+        else:
+            return jsonify({'message': 'Formato de valor inválido'}), 500
     
-    if not books_found:
+    if df_query.shape[0] == 0:
         return jsonify({'message': 'Nenhum livro encontrado'}), 404
     
-    return jsonify([
-        {
-            'id': b.id,
-            'title': b.title,
-            'price': b.price,
-            'rating': b.rating,
-            'availability': b.availability,
-            'category': b.category,
-            'image': b.image
-        }
-        for b in books_found
-    ]), 200
+    return jsonify(df_query.to_dict(orient = 'records')), 200
 
 # ----------------------------------------------------------------------------------------------- #
 # Verificar status da API e conectividade com os dados
@@ -368,7 +286,7 @@ def get_books_price_range():
 @bp.route('/api/v1/health', methods=['GET'])
 def get_api_health():
     """
-    Verifica o status da API e de suas dependências
+    Verifica o status da API e a disponibilidade dos dados em memória.
     ---
     tags:
       - API Health
@@ -392,19 +310,23 @@ def get_api_health():
               version: "1.0.0"
               environment: development
     """
+    health_status = {
+        "status": "ok",
+        "api": "running",
+        "data_loaded": False,
+        "rows": 0,
+        "checked_at": datetime.utcnow().isoformat() + "Z"
+    }
+
     try:
-        db.session.execute(text('SELECT 1'))
-        db_status = 'ok'
-    except Exception:
-        db_status = 'error'
+        if df is not None:
+            health_status["rows"] = df.shape[0]
+            health_status["data_loaded"] = not df.empty
+    except Exception as e:
+        health_status["status"] = "error"
+        health_status["error"] = str(e)
+        return jsonify(health_status), 500
 
-    status_code = 200 if db_status == 'ok' else 503
-
-    return jsonify({
-        'status': 'ok' if db_status == 'ok' else 'degraded',
-        'database': db_status,
-        'version': current_app.config.get('API_VERSION', '1.0.0'),
-        'environment': current_app.config.get('ENV', 'development')
-    }), status_code
+    return jsonify(health_status), 200
 
 

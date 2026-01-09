@@ -214,3 +214,6 @@ debug.ipynb
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# códigos legados
+legacy/

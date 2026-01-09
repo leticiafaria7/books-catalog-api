@@ -4,16 +4,16 @@
 
 import logging
 import os
+import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from flask import Flask
 
 # ----------------------------------------------------------------------------------------------- #
-# Criar pasta se não existir
+# Definir nome da pasta de documentação dos logs
 # ----------------------------------------------------------------------------------------------- #
 
 LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok = True)
 
 # ----------------------------------------------------------------------------------------------- #
 # Configurar registros de logs
@@ -37,28 +37,32 @@ def setup_logging(app: Flask) -> None:
         OSError: Pode ocorrer se o diretório LOG_DIR não existir ou não for gravável.
     """
 
-    # definir o fuso horário para garantir consistência nos nomes dos arquivos
-    tz_sp = ZoneInfo("America/Sao_Paulo")
-    timestamp = datetime.now(tz_sp).strftime("%Y-%m-%d_%H-%M-%S")
-
-    # definir o caminho completo do arquivo de log baseado no timestamp atual
-    log_file = f"{LOG_DIR}/app_{timestamp}.log"
-
     # definir o layout da mensagem: [Data/Hora] Nível de Severidade em NomeDoModulo: Mensagem
     formatter = logging.Formatter(
         "[%(asctime)s] %(levelname)s in %(module)s: %(message)s"
     )
 
-    # configurar o handler para gravar as mensagens no arquivo físico
-    file_handler = logging.FileHandler(log_file)
-    file_handler.setFormatter(formatter)
-
-    # limpar os handlers existentes para evitar duplicidade de mensagens (ex: logs padrão do Flask)
+    # limpar handlers existentes
     app.logger.handlers.clear()
-
-    # adicionar o novo handler configurado e define o nível mínimo de captura para INFO
-    app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
 
-    # log de confirmação da inicialização bem-sucedida
-    app.logger.info("Logger inicializado (America/Sao_Paulo)")
+    # sempre logar em stdout (Vercel captura)
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(formatter)
+    app.logger.addHandler(stream_handler)
+
+    # SOMENTE LOCAL: criar pasta e arquivo
+    if not os.getenv("VERCEL"):
+        tz_sp = ZoneInfo("America/Sao_Paulo")
+        timestamp = datetime.now(tz_sp).strftime("%Y-%m-%d_%H-%M-%S")
+
+        os.makedirs(LOG_DIR, exist_ok = True)
+        log_file = f"{LOG_DIR}/app_{timestamp}.log"
+
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(formatter)
+        app.logger.addHandler(file_handler)
+
+        app.logger.info("Logger inicializado em arquivo (local)")
+    else:
+        app.logger.info("Logger inicializado (stdout / Vercel)")

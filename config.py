@@ -18,8 +18,8 @@ url_books = "https://books.toscrape.com/"
 class Config:
 
     # configurações de segurança
-    SECRET_KEY = 'sua_chave_secreta'
-    JWT_SECRET_KEY = 'sua_chave_jwt_secreta'
+    # SECRET_KEY = 'sua_chave_secreta'
+    # JWT_SECRET_KEY = 'sua_chave_jwt_secreta'
 
     # caching básico
     CACHE_TYPE = 'simple'
@@ -31,8 +31,8 @@ class Config:
     }
 
     # definição do banco
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///books.db'
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///books.db'
 
     # evitar warnings
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # SQLALCHEMY_TRACK_MODIFICATIONS = False
 
