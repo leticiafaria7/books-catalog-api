@@ -12,7 +12,6 @@ Este aplicativo é uma **API pública** que permite alimentar sistemas de recome
 
 ## 📐 Arquitetura
 ![Plano arquitetural](src/static/plano_arquitetural.png)
-![Fluxograma dos módulos](src/static/fluxograma_modulos.png)
 
 ## 📂 Estrutura do projeto
 ```
@@ -47,6 +46,9 @@ books-api/
 ```
 ![Estrutura de pastas](src/static/estrutura_pastas.png)
 
+*Como os módulos estão relacionados*
+![Fluxograma dos módulos](src/static/fluxograma_modulos.png)
+
 ## 🧭 Rotas da API (Endpoints)
 
 A API de recomendação de livros expõe os seguintes endpoints:
@@ -62,11 +64,11 @@ A API de recomendação de livros expõe os seguintes endpoints:
 | `GET /api/v1/health`                                         | Verifica status da API e conectividade com os dados.          |
 | `GET /api/v1/stats/categories`                               | Estatísticas detalhadas por categoria (quantidade de livros, preços por categoria, média de nota). |
 | `GET /api/v1/stats/overview`                                 | Estatísticas gerais da coleção (total de livros, preço médio, distribuição de ratings). |
-| `POST /api/v1/auth/register`                                 | Resgistra um novo usuário inputando username e password       |
+| `POST /api/v1/auth/register`                                 | Registra um novo usuário inputando username e password       |
 | `POST /api/v1/auth/login`                                    | Gera o token de acesso para acessar rotas protegidas          |
 
 ## 📄 Documentação do projeto
-A documentação da API é gerada automaticamente com Swagger e pode ser acessada em `http://localhost:5000/apidocs/`.
+A documentação da API é gerada automaticamente com Swagger e pode ser acessada em `/apidocs`.
 
 ## ✅ Instruções para execução com Python
 
@@ -80,30 +82,30 @@ url = 'http://localhost:5000'
 
 ### 1. Registrar usuário
 ```python
-# input
-payload = {'username':'username', 'password':'password'} # alterar as chaves para os username e password desejados
+# alterar as chaves para os username e password desejados
+payload = {'username':'username', 'password':'password'}
 
 resp = requests.post(f"{url}/api/v1/auth/register", json = payload)
-print(resp.status_code) # se 200, deu certo
+print(resp.status_code) # se for 200, deu certo
 ```
 
 ### 2. Fazer login e gerar token de acesso
 ```python
-# input
-payload = {'username':'username', 'password':'password'} # colocar username e senha registrados
+# colocar username e senha registrados
+payload = {'username':'username', 'password':'password'}
 
 resp = requests.post(f"{url}/api/v1/auth/login", json = payload)
-access_token = resp.json()['access_token'] # o token de acesso ficará armazenado na variável access_token
+# armazenar o token de acesso na variável access_token
+access_token = resp.json()['access_token'] 
 print(access_token)
 ```
 
 ### 3. Usar token de acesso para obter a lista de livros
 ```python
-# input
 header = {'Authorization': f"Bearer {access_token}"}
 endpoint_livros = f"{url}/api/v1/books"
-lista_livros = requests.get(endpoint_livros, headers = header).json() # a lista de livros fica armazenada na variável lista_livros
-# print(resp.json())
+# armazenar a lista de livros na variável lista_livros
+lista_livros = requests.get(endpoint_livros, headers = header).json()
 ```
 
 ### 4. Overview (obter as estatísticas gerais da coleção)
@@ -151,8 +153,8 @@ resp = requests.get(price_range).json()
 ## 🚀 Trabalhos futuros
 
 **Outros endpoints para sistema de autenticação**
-2. `POST /api/v1/auth/refresh` | renovar token
-3. `/api/v1/scraping/trigger` | proteger endpoints de admin
+1. `POST /api/v1/auth/refresh` | renovar token
+2. `/api/v1/scraping/trigger` | proteger endpoints de admin
 
 **Endpoints para pipeline ML-ready (endpoints para consumo de modelos ML)**
 1. `GET /api/v1/ml/features` | dados formatados para features
