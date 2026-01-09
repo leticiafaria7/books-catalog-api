@@ -5,7 +5,7 @@
 Este aplicativo é uma **API pública** que permite alimentar sistemas de recomendação de livros. A infraestrutura foi projetada para **extrair, transformar e disponibilizar dados** de livros de forma escalável e reusável, atendendo às necessidades de cientistas de dados e modelos de Machine Learning (ML).
 
 ## ⚙️ Funcionalidades:
-- ~**Autenticação básica:** Protege rotas sensíveis usando autenticação HTTP básica~
+- **Autenticação básica:** Registra usuário para acessar rotas protegidas usando autenticação HTTP básica
 - **Operações CRUD:** Permite criar e ler itens
 - **Web Scraping:** Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena em dois formatos: `.csv` e em banco de dados SQLAlchemy
 - **Documentação:** Obtida automaticamente com Swagger
@@ -44,9 +44,11 @@ books-api/
 │   └── books.db
 └── logs/
 ```
+
+*Descrição dos arquivos:*
 ![Estrutura de pastas](src/static/estrutura_pastas.png)
 
-*Como os módulos estão relacionados*
+*Como os módulos estão relacionados:*
 ![Fluxograma dos módulos](src/static/fluxograma_modulos.png)
 
 ## 🧭 Rotas da API (Endpoints)
@@ -93,8 +95,8 @@ print(resp.status_code) # se for 200, deu certo
 ```python
 # colocar username e senha registrados
 payload = {'username':'username', 'password':'password'}
-
 resp = requests.post(f"{url}/api/v1/auth/login", json = payload)
+
 # armazenar o token de acesso na variável access_token
 access_token = resp.json()['access_token'] 
 print(access_token)
@@ -104,6 +106,7 @@ print(access_token)
 ```python
 header = {'Authorization': f"Bearer {access_token}"}
 endpoint_livros = f"{url}/api/v1/books"
+
 # armazenar a lista de livros na variável lista_livros
 lista_livros = requests.get(endpoint_livros, headers = header).json()
 ```
