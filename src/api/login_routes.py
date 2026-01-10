@@ -78,8 +78,6 @@ def register_user():
 
     return jsonify({"message": "Usuário criado com sucesso"}), 201
 
-# no postman: body > raw > JSON > criar dict com username e password > send
-
 # ----------------------------------------------------------------------------------------------- #
 # Login de usuário e geração de token de autenticação
 # ----------------------------------------------------------------------------------------------- #

@@ -164,17 +164,16 @@ def home():
     fig.update_layout(
         plot_bgcolor = "rgba(0, 0, 0, 0)", 
         paper_bgcolor = "rgba(0, 0, 0, 0)",
-        showlegend=False,
+        showlegend = False,
         title = title,
-        barcornerradius=4,
-        height=320,
-        # margin = dict(t = 150)
+        barcornerradius = 4,
+        height = 320,
     )
 
     fig.update_traces(
-        width=0.5,
-        textposition="outside",
-        marker_color="white",
+        width = 0.5,
+        textposition = "outside",
+        marker_color = "white",
         textfont = dict(color = 'white', size = 10)
     )
 

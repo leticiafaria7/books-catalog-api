@@ -1,6 +1,8 @@
 # API para consulta de livros
 *Tech Challenge da Fase 1 do curso de [pós-graduação em Engenharia de Machine Learning FIAP](https://postech.fiap.com.br/curso/machine-learning-engineering/)*
 
+> API disponível em https://books-catalog-api.onrender.com/
+
 ## ✨ Sobre o projeto
 Este aplicativo é uma **API pública** que permite alimentar sistemas de recomendação de livros. A infraestrutura foi projetada para **extrair, transformar e disponibilizar dados** de livros de forma escalável e reusável, atendendo às necessidades de cientistas de dados e modelos de Machine Learning (ML).
 
