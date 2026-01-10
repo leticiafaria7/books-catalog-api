@@ -4,6 +4,7 @@
 
 from flasgger import Swagger
 from flask import Blueprint
+from flask_jwt_extended import JWTManager
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializar instâncias
@@ -11,3 +12,4 @@ from flask import Blueprint
 
 swagger = Swagger()
 bp = Blueprint('main', __name__)
+jwt = JWTManager()

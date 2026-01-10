@@ -2,7 +2,8 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
-from flask import request, jsonify, current_app
+from flask import request, jsonify
+from flask_jwt_extended import jwt_required
 import pandas as pd
 from datetime import datetime
 from ..instances import bp
@@ -18,13 +19,15 @@ df = pd.read_csv('data/base_livros.csv')
 # ----------------------------------------------------------------------------------------------- #
 
 @bp.route('/api/v1/books', methods = ['GET'])
-
+@jwt_required()
 def get_books():
     """
     Lista de livros disponíveis na base
     ---
     tags:
       - Informações dos livros
+    security:
+      - BearerAuth: []
     responses:
       200:
         description: Dicionário id-título
@@ -32,6 +35,8 @@ def get_books():
           type: object
           additionalProperties:
             type: string
+      401:
+        description: Token não fornecido ou inválido
     """
     dict_books = df.set_index('id')['title'].to_dict()
 

@@ -180,6 +180,45 @@ def home():
 
     fig.update_annotations(font = dict(color = "white", size = 11, family = 'Roboto'))
 
+    # Ícone (imagem)
+    fig.add_layout_image(
+        dict(
+            source="/static/question_mark.png",
+            xref="x4 domain",
+            yref="y4 domain",
+            x=1.02,
+            y=1.18,
+            sizex=0.1,
+            sizey=0.1,
+            xanchor="left",
+            yanchor="top",
+            layer="above"
+        )
+    )
+
+    # Ponto invisível para hover
+    fig.add_annotation(
+        x=1.03,
+        y=1.18,
+        xref="x4 domain",
+        yref="y4 domain",
+        xanchor='left',
+        text="   ",  # texto vazio
+        showarrow=False,
+        hovertext=(
+            "O score da categoria é um valor entre 0 e 1;<br>"
+            "ele é maior quanto:<br>"
+            "• Maior a quantidade de livros<br>"
+            "• Menor o preço médio<br>"
+            "• Maior o rating médio"
+        ),
+        hoverlabel=dict(
+            bgcolor="#4d4d4d",
+            font_size=12,
+            font_family="Roboto"
+        ),
+    )
+
     top_categories_chart = pio.to_html(fig, full_html=False)
 
     # ----------------------------------------------------------------------------------------------- #

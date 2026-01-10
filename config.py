@@ -11,6 +11,9 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 url_books = "https://books.toscrape.com/"
 
+SUPABASE_URL = 'https://ofxoequhfyfxrhnwbpoh.supabase.co'
+SUPABASE_KEY = 'sb_publishable_lxna1eHdsSnLqMD0f_rHEg_sJO1iC0l'
+
 # ----------------------------------------------------------------------------------------------- #
 # Classe Config
 # ----------------------------------------------------------------------------------------------- #
@@ -18,7 +21,7 @@ url_books = "https://books.toscrape.com/"
 class Config:
 
     # configurações de segurança
-    # SECRET_KEY = 'sua_chave_secreta'
+    SECRET_KEY = 'louvre_key'
     # JWT_SECRET_KEY = 'sua_chave_jwt_secreta'
 
     # caching básico
