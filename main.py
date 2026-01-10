@@ -2,6 +2,9 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, current_app, request
 import os
 
@@ -10,8 +13,7 @@ from src.api import api_endpoints, home_layout, login_routes
 from src.instances import bp, swagger, jwt
 from src.logging_config import setup_logging
 
-from vars import BASE_DIR, url_books
-from src.config import Config
+from config import Config, BASE_DIR, url_books
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializações
@@ -42,6 +44,7 @@ app.register_blueprint(bp)
 # ----------------------------------------------------------------------------------------------- #
 
 if __name__ == '__main__':
+    # print(os.getenv("SUPABASE_URL"))
     with app.app_context():
         app.run(debug = True)
     

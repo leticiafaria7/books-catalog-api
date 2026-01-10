@@ -52,7 +52,7 @@ def setup_logging(app: Flask) -> None:
     app.logger.addHandler(stream_handler)
 
     # SOMENTE LOCAL: criar pasta e arquivo
-    if not os.getenv("VERCEL"):
+    if os.getenv("FLASK_ENV") == "development":
         tz_sp = ZoneInfo("America/Sao_Paulo")
         timestamp = datetime.now(tz_sp).strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -65,4 +65,4 @@ def setup_logging(app: Flask) -> None:
 
         app.logger.info("Logger inicializado em arquivo (local)")
     else:
-        app.logger.info("Logger inicializado (stdout / Vercel)")
+        app.logger.info("Logger inicializado (stdout / Render)")

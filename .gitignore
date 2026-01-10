@@ -142,6 +142,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .envrc
 .venv
 env/
@@ -220,6 +221,3 @@ legacy/
 
 # notebooks de teste
 nb_tests/
-
-# config keys
-config.py

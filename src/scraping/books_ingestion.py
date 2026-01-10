@@ -21,7 +21,7 @@ from pathlib import Path
 PROJECT_ROOT = Path().resolve().parents[1]
 sys.path.append(str(PROJECT_ROOT))
 
-from vars import url_books
+from config import url_books
 
 # ----------------------------------------------------------------------------------------------- #
 # Função para printar o horário da execução
