@@ -10,7 +10,7 @@ from src.api import api_endpoints, home_layout, login_routes
 from src.instances import bp, swagger, jwt
 from src.logging_config import setup_logging
 
-from config_keys import BASE_DIR, url_books
+from vars import BASE_DIR, url_books
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializações

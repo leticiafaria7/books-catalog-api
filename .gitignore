@@ -222,4 +222,4 @@ legacy/
 nb_tests/
 
 # config keys
-config_keys.py
+config.py
