@@ -221,3 +221,6 @@ legacy/
 
 # notebooks de teste
 nb_tests/
+
+# arquivo do vercel
+vercel.json
