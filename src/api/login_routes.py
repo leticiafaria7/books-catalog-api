@@ -8,7 +8,7 @@ from supabase import create_client
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ..instances import bp
-from config import SUPABASE_KEY, SUPABASE_URL
+from src.config import SUPABASE_KEY, SUPABASE_URL
 
 # configurações da supabase (para armazenar os logins)
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)

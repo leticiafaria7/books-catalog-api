@@ -11,6 +11,7 @@ from src.instances import bp, swagger, jwt
 from src.logging_config import setup_logging
 
 from vars import BASE_DIR, url_books
+from src.config import Config
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializações
@@ -21,7 +22,7 @@ app = Flask(__name__,
             template_folder = os.path.join(BASE_DIR, "src", "templates"),
             static_folder = os.path.join(BASE_DIR, "src", "static"))
 
-app.config.from_object('config.Config')
+app.config.from_object(Config)
 
 # inicializar as instâncias no app
 swagger.init_app(app)
