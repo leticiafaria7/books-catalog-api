@@ -131,31 +131,21 @@ resp = requests.get(overview).json()
 
 ### 5. Obter livros de uma faixa de preço
 ``` python
-# input
-min = 30
-max = 40
-price_range = f"{url}/api/v1/books/price-range?min={min}&max={max}"
-resp = requests.get(price_range).json()
+# colocar no dict os termos de busca (nenhum deles é obrigatório)
+params = {'min':20, 'max':25}
+
+price_range = f"{url}/api/v1/books/price-range"
+resp = requests.get(price_range, params = params).json()
 ```
 
+### 6. Pesquisar livros por título e categoria
 ``` python
-# output esperado
-[{'availability': 'In stock',
-  'category': 'Travel',
-  'id': 4,
-  'image': 'https://books.toscrape.com/media/cache/d5/bf/d5bf0090470b0b8ea46d9c166f7895aa.jpg',
-  'price': 36.94,
-  'rating': 2,
-  'title': 'Vagabonding: An Uncommon Guide to the Art of Long-Term World Travel'},
- {'availability': 'In stock',
-  'category': 'Travel',
-  'id': 5,
-  'image': 'https://books.toscrape.com/media/cache/98/c2/98c2e95c5fd1a4e7cd5f2b63c52826cb.jpg',
-  'price': 37.33,
-  'rating': 3,
-  'title': 'Under the Tuscan Sun'},
-...
-]
+# colocar no dict os termos de busca (nenhum deles é obrigatório)
+params = {'title':'dog', 'category':''}
+
+search = f"{url}/api/v1/books/search"
+resp = requests.get(search, params = params).json()
+print(resp)
 ```
 ## 🚀 Evolução da API
 
