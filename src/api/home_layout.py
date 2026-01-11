@@ -206,7 +206,7 @@ def home():
         showarrow=False,
         hovertext=(
             "O score da categoria é um valor entre 0 e 1;<br>"
-            "ele é maior quanto:<br>"
+            "ele é maior quanto:<br><br>"
             "• Maior a quantidade de livros<br>"
             "• Menor o preço médio<br>"
             "• Maior o rating médio"
@@ -218,7 +218,7 @@ def home():
         ),
     )
 
-    top_categories_chart = pio.to_html(fig, full_html=False)
+    top_categories_chart = pio.to_html(fig, full_html = False)
 
     # ----------------------------------------------------------------------------------------------- #
     # Renderizar os gráficos na página inicial
