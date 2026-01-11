@@ -87,16 +87,18 @@ url = 'https://books-catalog-api.onrender.com'
 ### 1. Registrar usuário
 ```python
 # alterar as chaves para os username e password desejados
-payload = {'username':'username', 'password':'password'}
+username = 'username'
+password = 'password'
+
+payload = {'username':username, 'password':password}
 
 resp = requests.post(f"{url}/api/v1/auth/register", json = payload)
-print(resp.status_code) # se for 200, deu certo
+print(resp.json())
 ```
 
 ### 2. Fazer login e gerar token de acesso
 ```python
-# colocar username e senha registrados
-payload = {'username':'username', 'password':'password'}
+payload = {'username':username, 'password':password}
 resp = requests.post(f"{url}/api/v1/auth/login", json = payload)
 
 # armazenar o token de acesso na variável access_token
