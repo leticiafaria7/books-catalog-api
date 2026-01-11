@@ -76,7 +76,7 @@ A documentação da API é gerada automaticamente com Swagger e pode ser acessad
 
 ## ✅ Instruções para execução com Python
 
-> Se não tiver a biblioteca `requests` instalada → executar no terminal `pip install requests`
+Se não tiver a biblioteca `requests` instalada → executar no terminal `pip install requests`
 ```
 import requests
 url = 'https://books-catalog-api.onrender.com'
