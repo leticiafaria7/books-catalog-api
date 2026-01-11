@@ -13,7 +13,7 @@ Este aplicativo é uma **API pública** que permite alimentar sistemas de recome
 - **Documentação:** Obtida automaticamente com Swagger
 
 ## 📐 Arquitetura
-![Plano arquitetural](src/static/plano_arquitetural.png)
+![Plano arquitetural](diagrams/plano_arquitetural.png)
 
 ## 📂 Estrutura do projeto
 ```
@@ -24,10 +24,10 @@ books-catalog-api/
 ├── config.py
 ├── src/
 │   ├── __init__.py
-│   ├── books_ingestion.py
 │   ├── instances.py
 │   ├── logging_config.py
 │   ├── scraping/
+│   │   ├── books_ingestion.py
 │   │   └── scraping_to_csv.ipynb
 │   ├── templates/
 │   │   └── home.html
@@ -42,20 +42,20 @@ books-catalog-api/
 │       └── home_layout.py
 ├── data/
 │   └── base_livros.csv
-├── instance/
-│   └── books.db
+├── diagrams/
+│   ├── plano_arquitetural.png
+│   ├── estrutura_pastas.png
+│   └── fluxograma_modulos.png
 └── logs/
 ```
 
 *Descrição dos arquivos:*
-![Estrutura de pastas](src/static/estrutura_pastas.png)
+![Estrutura de pastas](diagrams/estrutura_pastas.png)
 
 *Como os módulos estão relacionados:*
-![Fluxograma dos módulos](src/static/fluxograma_modulos.png)
+![Fluxograma dos módulos](diagrams/fluxograma_modulos.png)
 
 ## 🧭 Rotas da API (Endpoints)
-
-A API de recomendação de livros expõe os seguintes endpoints:
 
 | Endpoint                                                     | Descrição                                                     |
 | :----------------------------------------------------------- | :------------------------------------------------------------ |
@@ -72,14 +72,14 @@ A API de recomendação de livros expõe os seguintes endpoints:
 | `POST /api/v1/auth/login`                                    | Gera o token de acesso para acessar rotas protegidas          |
 
 ## 📄 Documentação do projeto
-A documentação da API é gerada automaticamente com Swagger e pode ser acessada em `/apidocs`.
+A documentação da API é gerada automaticamente com Swagger e pode ser acessada em https://books-catalog-api.onrender.com/apidocs.
 
 ## ✅ Instruções para execução com Python
 
 > Se não tiver a biblioteca `requests` instalada → executar no terminal `pip install requests`
 ```
 import requests
-url = 'http://localhost:5000'
+url = 'https://books-catalog-api.onrender.com'
 ```
 
 ## 🛠️ Exemplos de chamadas com requests/responses
