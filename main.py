@@ -5,14 +5,15 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from flask import Flask, current_app, request
+from flask import Flask
 import os
 
 from src.api import api_endpoints, home_layout, login_routes
 from src.instances import bp, swagger, jwt
-from src.logging_config import setup_logging
+from src.logging_config import setup_logging, register_request_logging
 
 from config import Config, BASE_DIR, url_books
+from src.api.login_routes import supabase
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializações
@@ -29,11 +30,7 @@ app.config.from_object(Config)
 swagger.init_app(app)
 jwt.init_app(app)
 setup_logging(app)
-
-# configuração de logs
-@app.before_request
-def log_request():
-    current_app.logger.info(f"{request.method} {request.path}")
+register_request_logging(app, supabase)
 
 # registrar as rotas
 app.register_blueprint(bp)

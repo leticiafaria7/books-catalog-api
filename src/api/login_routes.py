@@ -2,10 +2,11 @@
 # Imports
 # ----------------------------------------------------------------------------------------------- #
 
-from flask import request, jsonify
+from flask import request, jsonify, g
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from supabase import create_client
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 from ..instances import bp
 from config import Config
@@ -39,7 +40,7 @@ def register_user():
     responses:
         201:
             description: Usuário criado com sucesso
-        400:
+        409:
             description: Usuário já existe
         415:
             description: Tipo de entrada não suportado
@@ -143,3 +144,13 @@ def login():
 def protected():
     current_user_id = get_jwt_identity() # retorna o identity usado na criação do token
     return jsonify({'msg':f"Usuário com ID {current_user_id} acessou a rota protegida"}), 200
+
+# ----------------------------------------------------------------------------------------------- #
+# Definir user_id no registro de logs
+# ----------------------------------------------------------------------------------------------- #
+
+@bp.route("/profile")
+@jwt_required()
+def profile():
+    g.user_id = get_jwt_identity()
+    return {"ok": True}

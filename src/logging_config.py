@@ -7,7 +7,9 @@ import os
 import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from flask import Flask
+from flask import Flask, request, g, current_app
+from werkzeug.exceptions import HTTPException
+from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 
 # ----------------------------------------------------------------------------------------------- #
 # Definir nome da pasta de documentação dos logs
@@ -16,7 +18,7 @@ from flask import Flask
 LOG_DIR = "logs"
 
 # ----------------------------------------------------------------------------------------------- #
-# Configurar registros de logs
+# Configurar registros de logs (local e flask)
 # ----------------------------------------------------------------------------------------------- #
 
 def setup_logging(app: Flask) -> None:
@@ -66,3 +68,71 @@ def setup_logging(app: Flask) -> None:
         app.logger.info("Logger inicializado em arquivo (local)")
     else:
         app.logger.info("Logger inicializado (stdout / Render)")
+
+# ----------------------------------------------------------------------------------------------- #
+# Configurar registros de logs (supabase)
+# ----------------------------------------------------------------------------------------------- #
+
+def register_request_logging(app, supabase):
+    tz_sp = ZoneInfo("America/Sao_Paulo")
+
+    IGNORED_PATHS = {
+        "/flasgger_static/swagger-ui-standalone-preset.js",
+        "/apispec_1.json",
+        "/flasgger_static/swagger-ui.css",
+        "/flasgger_static/swagger-ui-bundle.js",
+        "/static/github.png",
+        "/flasgger_static/lib/jquery.min.js",
+        "/static/styles.css",
+        "/static/question_mark.png",
+    }
+
+    # Carregar usuário (ANTES do logging e do after_request)
+    @app.before_request
+    def load_user():
+        try:
+            verify_jwt_in_request(optional=True)
+            g.user_id = get_jwt_identity()
+        except Exception:
+            g.user_id = None
+
+    # Log simples em stdout
+    @app.before_request
+    def log_request():
+        g.request_start_time = datetime.now(tz_sp)
+        current_app.logger.info(
+            f"{request.method} {request.path}"
+        )
+
+    # Log estruturado no Supabase
+    def log_request_to_supabase_factory(supabase):
+        def log_request_to_supabase(response):
+            if request.path in IGNORED_PATHS:
+                return response
+
+            try:
+                supabase.table("api_request_logs").insert({
+                    "user_id": g.user_id,
+                    "method": request.method,
+                    "path": request.path,
+                    "status_code": response.status_code,
+                }).execute()
+
+            except Exception as e:
+                current_app.logger.error(
+                    f"Erro ao salvar log no Supabase: {e}"
+                )
+
+            return response
+
+        return log_request_to_supabase
+
+    app.after_request(log_request_to_supabase_factory(supabase))
+
+    # Tratamento de exceções
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        if isinstance(e, HTTPException):
+            return e
+        current_app.logger.exception(e)
+        return {"error": "internal server error"}, 500
