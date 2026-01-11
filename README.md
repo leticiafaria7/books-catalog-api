@@ -11,6 +11,7 @@ Este aplicativo é uma **API pública** que fornece dados para realizar análise
 - **Operações CRUD:**<br>Endpoints `POST` (para registro do usuário e login para obtenção do token de acesso) e `GET` (para obter dados dos livros)
 - **Sistema de autenticação:**<br>Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
 - **Documentação:**<br>Obtida automaticamente com Swagger
+- **Registro de logs:**<br>As requisições dos usuários são registradas em uma tabela no Supabase para análises de uso da API
 
 ## 📐 Arquitetura
 ![Plano arquitetural](diagrams/plano_arquitetural.png)
@@ -161,7 +162,6 @@ print(resp)
 **Monitoramento e analytics**
 1. Métricas de performance da API
 2. Dashboard simples de uso (streamlit)
-3. Registrar dados de uso da API por usuário (para análises de uso)
 
 **Escalabilidade**
 1. [Se a fonte de dados recebesse novos livros com frequência] Criar endpoints para fazer o scraping dos novos livros e armazenar em banco de dados
