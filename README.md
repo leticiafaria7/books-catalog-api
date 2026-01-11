@@ -4,7 +4,7 @@
 > API disponível em https://books-catalog-api.onrender.com/
 
 ## ✨ Sobre o projeto
-Este aplicativo é uma **API pública** que fornece dados para realizar análises de dados e alimentar sistemas de recomendação de livros. A estrutura projetada para extrair, transformar e disponibilizar dados de livros a cientistas de dados e modelos de Machine Learning (ML).
+Este aplicativo é uma **API pública** que fornece dados para realizar análises de dados e alimentar sistemas de recomendação de livros. A estrutura projetada para extrair, transformar e disponibilizar dados de livros a cientistas de dados e modelos de Machine Learning (como sistemas de recomendação).
 
 ## ⚙️ Funcionalidades:
 - **Web Scraping:**<br>Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena arquivo `.csv`
