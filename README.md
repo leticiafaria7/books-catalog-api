@@ -4,13 +4,13 @@
 > API disponível em https://books-catalog-api.onrender.com/
 
 ## ✨ Sobre o projeto
-Este aplicativo é uma **API pública** que permite alimentar sistemas de recomendação de livros. A infraestrutura foi projetada para **extrair, transformar e disponibilizar dados** de livros de forma escalável e reusável, atendendo às necessidades de cientistas de dados e modelos de Machine Learning (ML).
+Este aplicativo é uma **API pública** que fornece dados para realizar análises de dados e alimentar sistemas de recomendação de livros. A estrutura projetada para extrair, transformar e disponibilizar dados de livros a cientistas de dados e modelos de Machine Learning (ML).
 
 ## ⚙️ Funcionalidades:
-- **Web Scraping:** Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena arquivo `.csv`
-- **Operações CRUD:** Endpoints `POST` (para registro do usuário e login para obtenção do token de acesso) e `GET` (para obter dados dos livros)
-- **Sistema de autenticação:** Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
-- **Documentação:** Obtida automaticamente com Swagger
+- **Web Scraping:**<br>Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena arquivo `.csv`
+- **Operações CRUD:**<br>Endpoints `POST` (para registro do usuário e login para obtenção do token de acesso) e `GET` (para obter dados dos livros)
+- **Sistema de autenticação:**<br>Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
+- **Documentação:**<br>Obtida automaticamente com Swagger
 
 ## 📐 Arquitetura
 ![Plano arquitetural](diagrams/plano_arquitetural.png)
@@ -59,7 +59,9 @@ books-catalog-api/
 
 | Endpoint                                                     | Descrição                                                     |
 | :----------------------------------------------------------- | :------------------------------------------------------------ |
-| `GET /api/v1/books`                                          | Lista todos os livros disponíveis na base de dados.           |
+| `POST /api/v1/auth/register`                                 | Registra um novo usuário recebendo username e password        |
+| `POST /api/v1/auth/login`                                    | Gera o token de acesso para acessar rotas protegidas          |
+| `GET /api/v1/books` 🔒                                       | Lista todos os livros disponíveis na base de dados.           |
 | `GET /api/v1/books/price-range?min={min}&max={max}`          | Filtra livros dentro de uma faixa de preço específica.        |
 | `GET /api/v1/books/search?title={title}&category={category}` | Busca livros por título e/ou categoria.                       |
 | `GET /api/v1/books/top-rated`                                | Lista os livros com melhor avaliação (rating mais alto).      |
@@ -68,8 +70,6 @@ books-catalog-api/
 | `GET /api/v1/health`                                         | Verifica status da API e conectividade com os dados.          |
 | `GET /api/v1/stats/categories`                               | Estatísticas detalhadas por categoria (quantidade de livros, preços por categoria, média de nota). |
 | `GET /api/v1/stats/overview`                                 | Estatísticas gerais da coleção (total de livros, preço médio, distribuição de ratings). |
-| `POST /api/v1/auth/register`                                 | Registra um novo usuário inputando username e password        |
-| `POST /api/v1/auth/login`                                    | Gera o token de acesso para acessar rotas protegidas          |
 
 ## 📄 Documentação do projeto
 A documentação da API é gerada automaticamente com Swagger e pode ser acessada em https://books-catalog-api.onrender.com/apidocs.
@@ -155,7 +155,7 @@ resp = requests.get(price_range).json()
 ...
 ]
 ```
-## 🚀 Trabalhos futuros
+## 🚀 Evolução da API
 
 **Outros endpoints para sistema de autenticação**
 1. `POST /api/v1/auth/refresh` | renovar token
@@ -169,3 +169,9 @@ resp = requests.get(price_range).json()
 **Monitoramento e analytics**
 1. Métricas de performance da API
 2. Dashboard simples de uso (streamlit)
+3. Registrar dados de uso da API por usuário (para análises de uso)
+
+**Escalabilidade**
+1. [Se a fonte de dados recebesse novos livros com frequência] Criar endpoints para fazer o scraping dos novos livros e armazenar em banco de dados
+2. Construir os endpoints dos livros a partir de queries do banco de dados (atualiza automaticamente listas e stats)
+3. Migrar o banco para um servidor em cloud
