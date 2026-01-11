@@ -7,9 +7,9 @@
 Este aplicativo é uma **API pública** que permite alimentar sistemas de recomendação de livros. A infraestrutura foi projetada para **extrair, transformar e disponibilizar dados** de livros de forma escalável e reusável, atendendo às necessidades de cientistas de dados e modelos de Machine Learning (ML).
 
 ## ⚙️ Funcionalidades:
-- **Autenticação básica:** Registra usuário para acessar rotas protegidas usando autenticação HTTP básica
-- **Operações CRUD:** Permite criar e ler itens
-- **Web Scraping:** Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena em dois formatos: `.csv` e em banco de dados SQLAlchemy
+- **Web Scraping:** Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena arquivo `.csv`
+- **Operações CRUD:** Endpoints `POST` (para registro do usuário e login para obtenção do token de acesso) e `GET` (para obter dados dos livros)
+- **Sistema de autenticação:** Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
 - **Documentação:** Obtida automaticamente com Swagger
 
 ## 📐 Arquitetura
@@ -68,7 +68,7 @@ books-catalog-api/
 | `GET /api/v1/health`                                         | Verifica status da API e conectividade com os dados.          |
 | `GET /api/v1/stats/categories`                               | Estatísticas detalhadas por categoria (quantidade de livros, preços por categoria, média de nota). |
 | `GET /api/v1/stats/overview`                                 | Estatísticas gerais da coleção (total de livros, preço médio, distribuição de ratings). |
-| `POST /api/v1/auth/register`                                 | Registra um novo usuário inputando username e password       |
+| `POST /api/v1/auth/register`                                 | Registra um novo usuário inputando username e password        |
 | `POST /api/v1/auth/login`                                    | Gera o token de acesso para acessar rotas protegidas          |
 
 ## 📄 Documentação do projeto
