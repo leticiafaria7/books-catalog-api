@@ -85,6 +85,10 @@ def register_request_logging(app, supabase):
         "/flasgger_static/lib/jquery.min.js",
         "/static/styles.css",
         "/static/question_mark.png",
+        '/api/v1/health',
+        '/',
+        '/flasgger_static/favicon-32x32.png',
+        '/static/favicon.png'
     }
 
     # Carregar usuário (ANTES do logging e do after_request)
