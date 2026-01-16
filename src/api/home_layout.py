@@ -141,6 +141,7 @@ def home():
 
     for feature, (col, desc, x_max) in features.items():
         tmp = df_categorias[df_categorias['n_books'] > 1][['category', feature, 'qtd_livros']].sort_values(feature, ascending = not desc).head().sort_values(feature, ascending = desc)
+        tmp['category'] = tmp['category'] + ' '
         if feature in['mean_price', 'mean_rating']:
             tmp['text'] = tmp[feature].astype(str) + ' (' + tmp['qtd_livros'] + ')'
         else:

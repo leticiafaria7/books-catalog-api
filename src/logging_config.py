@@ -88,7 +88,9 @@ def register_request_logging(app, supabase):
         '/api/v1/health',
         '/',
         '/flasgger_static/favicon-32x32.png',
-        '/static/favicon.png'
+        '/static/favicon.png',
+        '/favicon.ico',
+        '/apidocs'
     }
 
     # Carregar usuário (ANTES do logging e do after_request)
