@@ -10,7 +10,7 @@ Este aplicativo é uma **API pública** que fornece dados para realizar análise
 ## ⚙️ Funcionalidades:
 - **Web Scraping:**<br>Extrai os dados dos livros (título, preço, rating, disponibilidade, categoria, imagem) do site [Books to scrape](https://books.toscrape.com/) e armazena arquivo `.csv`
 - **Operações CRUD:**<br>Endpoints `POST` (para registro do usuário e login para obtenção do token de acesso) e `GET` (para obter dados dos livros)
-- **Sistema de autenticação:**<br>Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
+- **Sistema de autenticação:**<br>Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no [Supabase](https://supabase.com/) (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
 - **Documentação:**<br>Obtida automaticamente com Swagger
 - **Registro de logs:**<br>As requisições dos usuários são registradas em uma tabela no Supabase para análises de uso da API
 - **Monitoramento**<br>A API é monitorada no [UptimeRobot](https://uptimerobot.com/), que executa o endpoint `/api/v1/health` a cada 5 minutos para evitar cold start do app
@@ -21,6 +21,7 @@ Este aplicativo é uma **API pública** que fornece dados para realizar análise
 ## 📂 Estrutura do projeto
 ```
 books-catalog-api/
+books-catalog-api/
 ├── README.md
 ├── requirements.txt
 ├── main.py
@@ -29,6 +30,10 @@ books-catalog-api/
 │   ├── __init__.py
 │   ├── instances.py
 │   ├── logging_config.py
+│   ├── api/
+│   │   ├── api_endpoints.py
+│   │   ├── login_routes.py
+│   │   └── home_layout.py
 │   ├── scraping/
 │   │   ├── books_ingestion.py
 │   │   └── scraping_to_csv.ipynb
@@ -39,10 +44,6 @@ books-catalog-api/
 │   │   ├── github.png
 │   │   ├── question_mark.png
 │   │   └── styles.css
-│   └── api/
-│       ├── api_endpoints.py
-│       ├── login_routes.py
-│       └── home_layout.py
 ├── data/
 │   └── base_livros.csv
 ├── diagrams/
@@ -110,7 +111,7 @@ print(access_token)
 ```
 
 ### 3. Usar token de acesso para obter a lista de livros
-***Obs:** no `/apidocs`, o token deve ser usado no botão verde "Authorize" (canto superior direito do Swagger) no formato Bearer <token> (sem o <>)*
+> ***Obs:** no `/apidocs`, o token deve ser usado no botão verde "Authorize" (canto superior direito do Swagger) no formato Bearer {token} (sem {})*
 ```python
 header = {'Authorization': f"Bearer {access_token}"}
 endpoint_livros = f"{url}/api/v1/books"
@@ -153,7 +154,7 @@ print(resp)
 ```
 
 ## 💻 Executando o projeto localmente
-*Em breve*
+*Em breve, descrição dos passos:*
 - Clonar o repositório
 - Configurar Supabase
 
