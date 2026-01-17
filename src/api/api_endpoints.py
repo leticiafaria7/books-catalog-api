@@ -6,7 +6,8 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 import pandas as pd
 from datetime import datetime
-from ..instances import bp
+from zoneinfo import ZoneInfo
+from ..instances import bp, supabase
 
 # ----------------------------------------------------------------------------------------------- #
 # Ler a base de dados
@@ -279,6 +280,8 @@ def get_books_price_range():
         else:
             return jsonify({'message': 'Formato de valor inválido'}), 500
     
+    df_query = df_query.sort_values('price')
+
     if df_query.shape[0] == 0:
         return jsonify({'message': 'Nenhum livro encontrado'}), 404
     
@@ -288,50 +291,52 @@ def get_books_price_range():
 # Verificar status da API e conectividade com os dados
 # ----------------------------------------------------------------------------------------------- #
 
+def check_database(supabase):
+    try:
+        supabase.table("api_request_logs").select("id").limit(1).execute()
+        return True
+    except Exception:
+        return False
+    
 @bp.route('/api/v1/health', methods=['GET'])
 def get_api_health():
     """
-    Verifica o status da API e a disponibilidade dos dados em memória.
+    Verifica o status da API e de suas dependências.
     ---
     tags:
       - API Health
     responses:
       200:
-        description: API e dependências saudáveis
-        content:
-          application/json:
-            example:
-              status: ok
-              database: ok
-              version: "1.0.0"
-              environment: development
+        description: API saudável
       503:
         description: API indisponível ou com dependências falhando
-        content:
-          application/json:
-            example:
-              status: degraded
-              database: error
-              version: "1.0.0"
-              environment: development
     """
+    tz_sp = ZoneInfo("America/Sao_Paulo")
+
     health_status = {
         "status": "ok",
         "api": "running",
+        "database": "ok",
         "data_loaded": False,
         "rows": 0,
-        "checked_at": datetime.utcnow().isoformat() + "Z"
+        "checked_at": datetime.now(tz_sp).isoformat(),
+        "version": "1.0.0",
+        "environment": "development"
     }
 
-    try:
-        if df is not None:
-            health_status["rows"] = df.shape[0]
-            health_status["data_loaded"] = not df.empty
-    except Exception as e:
-        health_status["status"] = "error"
-        health_status["error"] = str(e)
-        return jsonify(health_status), 500
+    http_status = 200
 
-    return jsonify(health_status), 200
+    # 🔹 Dados em memória
+    if df is not None and not df.empty:
+        health_status["data_loaded"] = True
+        health_status["rows"] = df.shape[0]
+    else:
+        health_status["status"] = "degraded"
 
+    # 🔹 Supabase
+    if not check_database(supabase):
+        health_status["database"] = "error"
+        health_status["status"] = "degraded"
+        http_status = 503
 
+    return jsonify(health_status), http_status

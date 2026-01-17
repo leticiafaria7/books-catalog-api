@@ -4,15 +4,10 @@
 
 from flask import request, jsonify, g
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from supabase import create_client
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 
-from ..instances import bp
-from config import Config
-
-# configurações da supabase (para armazenar os logins)
-supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
+from ..instances import bp, supabase
 
 # ----------------------------------------------------------------------------------------------- #
 # Registrar usuário

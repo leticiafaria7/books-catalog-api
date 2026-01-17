@@ -13,6 +13,7 @@ Este aplicativo é uma **API pública** que fornece dados para realizar análise
 - **Sistema de autenticação:**<br>Baseado em JWT (JSON Web Tokens). O usuário cria suas credenciais (login e senha) e esses dados de autenticação são persistidos no Supabase (PostgreSQL). Ao realizar a autenticação, a API retorna um token que deve ser utilizado para acessar rotas protegidas via `Authorization: Bearer <token>`
 - **Documentação:**<br>Obtida automaticamente com Swagger
 - **Registro de logs:**<br>As requisições dos usuários são registradas em uma tabela no Supabase para análises de uso da API
+- **Monitoramento**<br>A API é monitorada no [UptimeRobot](https://uptimerobot.com/), que executa o endpoint `/api/v1/health` a cada 5 minutos para evitar cold start do app
 
 ## 📐 Arquitetura
 ![Plano arquitetural](diagrams/plano_arquitetural.png)
@@ -109,6 +110,7 @@ print(access_token)
 ```
 
 ### 3. Usar token de acesso para obter a lista de livros
+***Obs:** no `/apidocs`, o token deve ser usado no botão verde "Authorize" (canto superior direito do Swagger) no formato Bearer <token> (sem o <>)*
 ```python
 header = {'Authorization': f"Bearer {access_token}"}
 endpoint_livros = f"{url}/api/v1/books"
@@ -149,6 +151,12 @@ search = f"{url}/api/v1/books/search"
 resp = requests.get(search, params = params).json()
 print(resp)
 ```
+
+## 💻 Executando o projeto localmente
+*Em breve*
+- Clonar o repositório
+- Configurar Supabase
+
 ## 🚀 Evolução da API
 
 **Outros endpoints para sistema de autenticação**

@@ -9,11 +9,10 @@ from flask import Flask
 import os
 
 from src.api import api_endpoints, home_layout, login_routes
-from src.instances import bp, swagger, jwt
+from src.instances import bp, swagger, jwt, supabase
 from src.logging_config import setup_logging, register_request_logging
 
-from config import Config, BASE_DIR, url_books
-from src.api.login_routes import supabase
+from config import Config, BASE_DIR
 
 # ----------------------------------------------------------------------------------------------- #
 # Inicializações
