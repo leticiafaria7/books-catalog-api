@@ -21,7 +21,6 @@ Este aplicativo é uma **API pública** que fornece dados para realizar análise
 ## 📂 Estrutura do projeto
 ```
 books-catalog-api/
-books-catalog-api/
 ├── README.md
 ├── requirements.txt
 ├── main.py
@@ -154,15 +153,88 @@ print(resp)
 ```
 
 ## 💻 Executando o projeto localmente
-*Em breve, descrição dos passos:*
-- Clonar o repositório
-- Configurar Supabase
+
+### 1. Instalação do Python
+As versões das bibliotecas usadas no projeto são compatíveis com Python na versão 3.11.3, então é recomendada a execução nesta versão para evitar conflitos. É possível fazer o download dela neste [link](https://www.python.org/downloads/release/python-3113/)
+
+### 2. Clonar o repositório
+No terminal, na pasta onde desejar clonar o repositório, executar:
+``` bash
+git clone https://github.com/leticiafaria7/books-catalog-api.git
+```
+
+### 3. Criar ambiente virtual
+Também no terminal, dentro da pasta do projeto, executar:
+
+*Criar ambiente virtual*
+``` bash
+python3.11 -m venv venv
+```
+
+*Ativar o ambiente*
+``` bash
+# Windows
+venv\Scripts\activate
+
+# MAC / Linux
+souce venv/bin/activate
+```
+
+*Instalar as dependências*
+``` bash
+pip install -r requirements.txt
+```
+
+### 4. Configurar Supabase (conexão com banco de dados)
+1. Dentro da pasta do projeto, criar um arquivo `.env`
+2. Entrar no site https://supabase.com/ e iniciar um projeto
+4. Dentro do projeto, no menu lateral esquerdo (oculto), ir em Project Settings
+5. No menu lateral esquerdo (Settings), ir em **Data API** e copiar a `Project URL`
+6. Também no menu lateral esquerdo (Settings), ir em **API Keys** e copiar a `Publishable key`
+7. No arquivo `.env`, substituir PROJECT_URL e PUBLISHABLE_KEY pelas respectivas chaves copiadas da seguinte forma: 
+
+ ``` python
+ SUPABASE_URL = 'PROJECT_URL'
+ SUPABASE_KEY = 'PUBLISHABLE_KEY'
+ ```
+### 5. Criar tabelas no Supabase para receber os dados
+No Supabase, no menu lateral esquerdo (oculto), ir em **SQL Editor** e executar os códigos:
+
+*Tabela para armazenar as credenciais dos usuários:*
+``` sql
+create table users (
+    id uuid default gen_random_uuid() primary key,
+    username text not null unique,
+    password_hash text not null,
+    created_at timestamp with time zone default timezone('America/Sao_Paulo', now())
+);
+```
+
+*Tabela para registrar os logs das requisições da API:*
+``` sql
+create table api_request_logs (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid null,
+    method text not null,
+    path text not null,
+    status_code integer,
+    ip_address text,
+    user_agent text,
+    created_at timestamptz not null default now()
+);
+```
+
+Será possível ver as tabelas (e os dados conforme forem recebidos nas execuções) em **Table Editor** no menu lateral esquerdo (oculto).
+
+As senhas dos usuários registrados são armazenadas de forma criptografada.
+
+No menu **SQL Editor**, também é possível fazer consultas nessas tabelas utilizando SQL.
 
 ## 🚀 Evolução da API
 
 **Outros endpoints para sistema de autenticação**
 1. `POST /api/v1/auth/refresh` | renovar token
-2. `/api/v1/scraping/trigger` | proteger endpoints de admin
+2. `/api/v1/scraping/trigger` | proteger endpoints de admin e criar níveis de usuários
 
 **Endpoints para pipeline ML-ready (endpoints para consumo de modelos ML)**
 1. `GET /api/v1/ml/features` | dados formatados para features
@@ -174,6 +246,6 @@ print(resp)
 2. Dashboard simples de uso (streamlit)
 
 **Escalabilidade**
-1. [Se a fonte de dados recebesse novos livros com frequência] Criar endpoints para fazer o scraping dos novos livros e armazenar em banco de dados
-2. Construir os endpoints dos livros a partir de queries do banco de dados (atualiza automaticamente listas e stats)
+1. [Se a fonte de dados recebesse novos livros com frequência] Criar endpoints para fazer o scraping dos novos livros e armazenar em tabela no banco de dados
+2. Construir os endpoints dos livros a partir de queries da tabela dos livros no banco (atualiza automaticamente os endpoints que retornam listas de livros e stats)
 3. Migrar o banco para um servidor em cloud
