@@ -4,6 +4,8 @@
 > API disponível em https://books-catalog-api.onrender.com/ <br>
 > ***Obs:** Embora a fonte de dados possua 1.000 livros, a API retorna 999, pois há um item duplicado.*
 
+> 📽️ [Vídeo com demonstração técnica da API](https://youtu.be/V2F9aswsO_s)
+
 ## ✨ Sobre o projeto
 Este aplicativo é uma **API pública** que fornece dados para realizar análises de dados e alimentar sistemas de recomendação de livros. A estrutura projetada para extrair, transformar e disponibilizar dados de livros a cientistas de dados e modelos de Machine Learning (como sistemas de recomendação).
 
